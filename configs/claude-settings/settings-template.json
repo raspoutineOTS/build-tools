@@ -1,0 +1,99 @@
+{
+  "agents": [
+    {
+      "name": "system-orchestrator", 
+      "description": "Use this agent to coordinate and delegate tasks to specialized agents for data management, messaging processing, and cloud operations. Examples: \"Extract messaging data and store in cloud\", \"Generate consolidated report from multiple sources\", \"Process new messages and categorize them\"",
+      "model": "sonnet",
+      "color": "green"
+    },
+    {
+      "name": "message-processor",
+      "description": "Use this agent to retrieve and process messages from multiple platforms (WhatsApp, Telegram, Discord, etc.), handle audio transcription, and perform conversation analysis. Examples: \"Get recent messages from WhatsApp\", \"Transcribe voice messages\", \"Search conversation history\"", 
+      "model": "sonnet",
+      "color": "blue"
+    },
+    {
+      "name": "data-sorter",
+      "description": "Use this agent to analyze, categorize, and intelligently sort data from multiple sources. Performs pattern recognition, priority classification, and content organization. Examples: \"Analyze message data for trends\", \"Categorize documents by type\", \"Identify high-priority items\"",
+      "model": "sonnet", 
+      "color": "yellow"
+    },
+    {
+      "name": "database-manager",
+      "description": "Use this agent to manage cloud databases, execute SQL operations, handle data migrations, and maintain database schemas. Supports multiple database types including Cloudflare D1, PostgreSQL, MySQL, and SQLite. Examples: \"Query user database\", \"Insert processed data\", \"Create table schema\"",
+      "model": "sonnet",
+      "color": "purple"
+    }
+  ],
+  "hooks": {
+    "SessionStart": [
+      "./automation/monitor-hooks/smart-monitor.sh"
+    ],
+    "UserPromptSubmit": [
+      "./automation/monitor-hooks/smart-monitor.sh"
+    ]
+  },
+  "preferences": {
+    "verbosity": "normal",
+    "auto_save": true,
+    "theme": "auto",
+    "confirm_destructive_actions": true
+  },
+  "mcp_servers": {
+    "messaging-bridge": {
+      "command": "python3",
+      "args": ["./mcp-servers/messaging-bridge/server.py"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "database-connector": {
+      "command": "python3", 
+      "args": ["./mcp-servers/database-connector/connector.py"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "context-wrapper": {
+      "command": "./mcp-servers/context-wrapper/wrapper.sh",
+      "args": [],
+      "env": {
+        "UPSTASH_REDIS_URL": "${UPSTASH_REDIS_URL}",
+        "UPSTASH_REDIS_TOKEN": "${UPSTASH_REDIS_TOKEN}",
+        "UPSTASH_VECTOR_URL": "${UPSTASH_VECTOR_URL}",
+        "UPSTASH_VECTOR_TOKEN": "${UPSTASH_VECTOR_TOKEN}"
+      }
+    }
+  },
+  "workflows": {
+    "data_processing": {
+      "description": "Process new data through the complete pipeline",
+      "steps": [
+        {
+          "agent": "message-processor",
+          "task": "Extract recent messages and media"
+        },
+        {
+          "agent": "data-sorter", 
+          "task": "Analyze and categorize extracted data"
+        },
+        {
+          "agent": "database-manager",
+          "task": "Store processed data in appropriate databases"
+        }
+      ]
+    },
+    "health_monitoring": {
+      "description": "Monitor system health and performance",
+      "steps": [
+        {
+          "script": "./automation/service-manager/daemon-manager.sh health"
+        },
+        {
+          "agent": "system-orchestrator",
+          "task": "Review health status and recommend actions"
+        }
+      ]
+    }
+  }
+}

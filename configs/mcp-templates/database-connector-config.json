@@ -1,0 +1,75 @@
+{
+  "databases": {
+    "default": {
+      "type": "sqlite",
+      "path": "~/.database-connector/default.db",
+      "read_only": false
+    },
+    "analytics": {
+      "type": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database": "analytics_db",
+      "username": "${DB_USERNAME}",
+      "password": "${DB_PASSWORD}",
+      "ssl": true,
+      "pool_size": 10
+    },
+    "cloudflare_d1_primary": {
+      "type": "cloudflare_d1",
+      "database_id": "${CLOUDFLARE_D1_DATABASE_ID}",
+      "account_id": "${CLOUDFLARE_ACCOUNT_ID}",
+      "api_token": "${CLOUDFLARE_API_TOKEN}"
+    }
+  },
+  "cloudflare_d1": {
+    "account_id": "${CLOUDFLARE_ACCOUNT_ID}",
+    "api_token": "${CLOUDFLARE_API_TOKEN}",
+    "databases": {
+      "core_db": {
+        "database_id": "${D1_CORE_DATABASE_ID}",
+        "name": "core_data",
+        "description": "Primary application database"
+      },
+      "analytics_db": {
+        "database_id": "${D1_ANALYTICS_DATABASE_ID}",
+        "name": "analytics_data",
+        "description": "Analytics and reporting database"
+      },
+      "messaging_db": {
+        "database_id": "${D1_MESSAGING_DATABASE_ID}",
+        "name": "messaging_data", 
+        "description": "Message and communication data"
+      }
+    }
+  },
+  "settings": {
+    "query_timeout": 30,
+    "max_connections": 10,
+    "cache_enabled": true,
+    "cache_ttl": 300,
+    "log_queries": true,
+    "backup_enabled": false,
+    "backup_schedule": "0 2 * * *"
+  },
+  "security": {
+    "require_ssl": true,
+    "encrypt_credentials": true,
+    "allowed_operations": ["SELECT", "INSERT", "UPDATE", "DELETE", "CREATE", "ALTER"],
+    "restricted_tables": [],
+    "audit_enabled": true
+  },
+  "performance": {
+    "connection_pool_size": 10,
+    "query_cache_size": 1000,
+    "slow_query_threshold": 2.0,
+    "enable_query_optimization": true,
+    "batch_insert_size": 1000
+  },
+  "monitoring": {
+    "health_check_interval": 60,
+    "performance_metrics": true,
+    "error_alerting": true,
+    "log_retention_days": 30
+  }
+}

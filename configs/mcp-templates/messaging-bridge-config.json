@@ -1,0 +1,54 @@
+{
+  "platforms": {
+    "whatsapp": {
+      "enabled": true,
+      "bridge_port": 8080,
+      "qr_auth": true,
+      "session_path": "~/.messaging-bridge/whatsapp-session",
+      "webhook_url": null
+    },
+    "telegram": {
+      "enabled": false,
+      "bot_token": "${TELEGRAM_BOT_TOKEN}",
+      "webhook_url": null,
+      "allowed_chats": []
+    },
+    "discord": {
+      "enabled": false,
+      "bot_token": "${DISCORD_BOT_TOKEN}",
+      "guild_ids": [],
+      "channel_ids": []
+    },
+    "slack": {
+      "enabled": false,
+      "bot_token": "${SLACK_BOT_TOKEN}",
+      "workspace_id": ""
+    }
+  },
+  "settings": {
+    "auto_transcribe": true,
+    "media_download": true,
+    "max_message_age": 30,
+    "batch_size": 100,
+    "sync_interval": 300,
+    "enable_notifications": true
+  },
+  "storage": {
+    "database_path": "~/.messaging-bridge/messages.db",
+    "media_directory": "~/.messaging-bridge/media",
+    "backup_enabled": true,
+    "backup_interval": 86400,
+    "retention_days": 90
+  },
+  "security": {
+    "encrypt_storage": false,
+    "allowed_file_types": [".jpg", ".png", ".pdf", ".docx", ".txt", ".mp3", ".ogg"],
+    "max_file_size": 52428800,
+    "scan_for_malware": false
+  },
+  "notifications": {
+    "new_message_threshold": 1,
+    "urgent_keywords": ["urgent", "emergency", "asap"],
+    "notification_methods": ["system_message", "log"]
+  }
+}

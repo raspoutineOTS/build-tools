@@ -1,0 +1,46 @@
+# Sensitive configuration
+.env
+*.key
+*.token
+*_token
+*-token
+*.pem
+*.p12
+
+# Local configurations  
+.mcp.json
+config.local.*
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Cache and builds
+.cache/
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.vscode/
+.idea/
+Thumbs.db
+
+# Go
+vendor/
+
+# Python
+venv/
+env/
+*.egg-info/
+
+# Runtime files
+*.pid
+*.sock
+session*
+store/
