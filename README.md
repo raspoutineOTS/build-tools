@@ -60,6 +60,7 @@ build-tools/
 ├── automation/                   # ⚙️ Automation Scripts
 │   ├── monitor-hooks/            # Smart monitoring system
 │   ├── document-processor/       # Document analysis tools
+│   ├── media-processors/         # Audio/Excel/Media processing
 │   └── service-manager/          # Service/daemon management
 ├── configs/                      # 🔧 Configuration Templates
 │   ├── claude-settings/          # Claude Code settings
@@ -213,6 +214,27 @@ Intelligent document analysis for multiple file formats.
 - Keywords and summary generation
 - Structured JSON output
 
+### Media Processors
+Advanced media processing tools for WhatsApp attachments and audio messages.
+
+**Audio Transcription:**
+```bash
+export ELEVENLABS_API_KEY="your_api_key"
+python3 automation/media-processors/audio-transcription-processor.py '[{"id":"MSG_ID","chat_jid":"123@s.whatsapp.net"}]'
+```
+
+**Excel Extractor:**
+```bash
+python3 automation/media-processors/excel-extractor.py "/path/to/file.xlsx" "ContactName" "MSG_ID"
+```
+
+**Features:**
+- Audio transcription with ElevenLabs API
+- Multi-language support with auto-detection
+- Excel/CSV data extraction
+- Automatic domain detection (medical, financial, logistics, HR)
+- Structured JSON output for database storage
+
 ### Service Manager
 Universal daemon and service management system.
 
@@ -240,6 +262,12 @@ Create a `.env` file in the project root:
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 DISCORD_BOT_TOKEN=your_discord_bot_token
 SLACK_BOT_TOKEN=your_slack_bot_token
+
+# Media Processing
+ELEVENLABS_API_KEY=your_elevenlabs_api_key
+WHATSAPP_STORE_PATH=/path/to/whatsapp/store
+TRANSCRIPTIONS_PATH=/path/to/transcriptions
+EXCEL_OUTPUT_PATH=/path/to/excel/output
 
 # Database Connections
 DB_USERNAME=your_db_username
