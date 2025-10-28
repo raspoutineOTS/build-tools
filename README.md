@@ -61,6 +61,7 @@ build-tools/
 │   ├── monitor-hooks/            # Smart monitoring system
 │   ├── document-processor/       # Document analysis tools
 │   ├── media-processors/         # Audio/Excel/Media processing
+│   ├── ocr-watcher/              # Automatic OCR with DeepSeek
 │   └── service-manager/          # Service/daemon management
 ├── configs/                      # 🔧 Configuration Templates
 │   ├── claude-settings/          # Claude Code settings
@@ -227,6 +228,39 @@ python3 automation/media-processors/audio-transcription-processor.py '[{"id":"MS
 ```bash
 python3 automation/media-processors/excel-extractor.py "/path/to/file.xlsx" "ContactName" "MSG_ID"
 ```
+
+### OCR Watcher 🔍
+**NEW!** Automatic OCR processing with DeepSeek-OCR and folder watching.
+
+![OCR Watcher CI](https://github.com/raspoutineOTS/build-tools/actions/workflows/test-ocr-watcher.yml/badge.svg)
+
+**Platform**: macOS Apple Silicon (M1/M2/M3/M4)
+
+**One-command installation:**
+```bash
+cd automation/ocr-watcher
+./install.sh
+```
+
+**Features:**
+- 🚀 Zero-configuration setup - installs everything automatically
+- 🔍 Auto-detect images - watches folder for new files
+- 📝 Extract everything - text, tables, LaTeX equations to Markdown
+- ⚡ Apple Silicon optimized - Metal acceleration
+- 🔄 Background processing - non-blocking operation
+- 📦 Bundled DeepSeek-OCR - integrated as git submodule
+
+**Usage:**
+```bash
+ocr-watch start         # Start watching
+ocr-watch status        # Check status
+ocr-watch logs          # View logs
+ocr-watch stop          # Stop watching
+```
+
+Drop images (PNG, JPG, PDF) into `~/Documents/OCR_Input` and get markdown results automatically!
+
+**[📖 Full Documentation](automation/ocr-watcher/README.md)**
 
 **Features:**
 - Audio transcription with ElevenLabs API
