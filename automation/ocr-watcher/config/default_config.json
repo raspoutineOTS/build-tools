@@ -1,0 +1,10 @@
+{
+  "watch_dir": "~/Documents/OCR_Input",
+  "ocr_bin": "./deepseek-ocr/target/release/deepseek-ocr-cli",
+  "supported_formats": [".png", ".jpg", ".jpeg", ".pdf"],
+  "default_prompt": "<image>\\n<|grounding|>Extrait tout le texte, tableaux et équations en markdown",
+  "max_tokens": 2048,
+  "device": "cpu",
+  "timeout_seconds": 300,
+  "log_level": "INFO"
+}
