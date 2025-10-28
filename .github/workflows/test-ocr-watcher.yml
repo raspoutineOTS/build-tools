@@ -1,0 +1,162 @@
+name: Test OCR Watcher
+
+on:
+  push:
+    paths:
+      - 'automation/ocr-watcher/**'
+      - '.github/workflows/test-ocr-watcher.yml'
+  pull_request:
+    paths:
+      - 'automation/ocr-watcher/**'
+      - '.github/workflows/test-ocr-watcher.yml'
+
+jobs:
+  test-macos-arm:
+    name: Test on macOS Apple Silicon
+    runs-on: macos-14  # M1 runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            automation/ocr-watcher/deepseek-ocr/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Python dependencies
+        run: |
+          cd automation/ocr-watcher
+          python3 -m pip install --user -r requirements.txt
+
+      - name: Lint Python code
+        run: |
+          python3 -m pip install --user flake8 black
+          cd automation/ocr-watcher
+          flake8 ocr_watcher.py --max-line-length=120 --ignore=E501,W503
+          black --check ocr_watcher.py || true
+
+      - name: Check script permissions
+        run: |
+          cd automation/ocr-watcher
+          test -x install.sh
+          test -x ocr-watcher.sh
+          test -x ocr_watcher.py
+
+      - name: Verify configuration files
+        run: |
+          cd automation/ocr-watcher
+          test -f config/default_config.json
+          test -f requirements.txt
+          test -f README.md
+          python3 -c "import json; json.load(open('config/default_config.json'))"
+
+      - name: Compile DeepSeek-OCR CLI
+        run: |
+          cd automation/ocr-watcher/deepseek-ocr
+          cargo build -p deepseek-ocr-cli --release --features metal
+
+      - name: Verify OCR binary
+        run: |
+          cd automation/ocr-watcher
+          test -f deepseek-ocr/target/release/deepseek-ocr-cli
+          ./deepseek-ocr/target/release/deepseek-ocr-cli --version
+
+      - name: Test Python imports
+        run: |
+          cd automation/ocr-watcher
+          python3 -c "import watchdog; print(f'✓ watchdog {watchdog.__version__}')"
+          python3 -c "from pathlib import Path; import ocr_watcher; print('✓ ocr_watcher module OK')"
+
+      - name: Test configuration loading
+        run: |
+          cd automation/ocr-watcher
+          python3 -c "
+import json
+from pathlib import Path
+config_file = Path('config/default_config.json')
+assert config_file.exists(), 'Config file not found'
+config = json.load(open(config_file))
+assert 'watch_dir' in config, 'watch_dir missing'
+assert 'ocr_bin' in config, 'ocr_bin missing'
+print('✓ Configuration valid')
+"
+
+      - name: Test shell script syntax
+        run: |
+          bash -n automation/ocr-watcher/install.sh
+          bash -n automation/ocr-watcher/ocr-watcher.sh
+          echo "✓ Shell scripts syntax OK"
+
+      - name: Create test directory structure
+        run: |
+          mkdir -p /tmp/ocr-test-input/.processed
+          echo "✓ Test directories created"
+
+      - name: Dry-run installation check
+        run: |
+          cd automation/ocr-watcher
+          # Check all installation components exist
+          test -f install.sh
+          test -f ocr_watcher.py
+          test -f ocr-watcher.sh
+          test -f requirements.txt
+          test -f config/default_config.json
+          test -d deepseek-ocr
+          echo "✓ All installation components present"
+
+  lint-and-format:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install linting tools
+        run: |
+          python3 -m pip install flake8 black isort
+
+      - name: Run flake8
+        run: |
+          cd automation/ocr-watcher
+          flake8 ocr_watcher.py --max-line-length=120 --statistics || true
+
+      - name: Check black formatting
+        run: |
+          cd automation/ocr-watcher
+          black --check --diff ocr_watcher.py || true
+
+      - name: Check import sorting
+        run: |
+          cd automation/ocr-watcher
+          isort --check-only --diff ocr_watcher.py || true
+
+      - name: Shellcheck
+        run: |
+          sudo apt-get install -y shellcheck
+          shellcheck automation/ocr-watcher/install.sh || true
+          shellcheck automation/ocr-watcher/ocr-watcher.sh || true

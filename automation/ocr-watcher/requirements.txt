@@ -1,0 +1,2 @@
+# Python dependencies for OCR Watcher
+watchdog>=6.0.0

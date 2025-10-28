@@ -1,0 +1,3 @@
+[submodule "automation/ocr-watcher/deepseek-ocr"]
+	path = automation/ocr-watcher/deepseek-ocr
+	url = https://github.com/TimmyOVO/deepseek-ocr.rs.git
