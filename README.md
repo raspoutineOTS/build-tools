@@ -2,6 +2,8 @@
 
 A comprehensive collection of modular tools for Claude Code automation and MCP (Model Context Protocol) integrations. This toolkit provides intelligent agents, universal servers, automation scripts, and configuration templates for building sophisticated AI-powered workflows.
 
+> **⚠️ Privacy Notice**: All examples and templates in this repository use **anonymized placeholders**. No real credentials, API tokens, phone numbers, or organizational data are included. Replace all `YOUR_*` placeholders with your actual values.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -178,6 +180,63 @@ cd mcp-servers/context-wrapper
 - Credential management
 - Health monitoring
 - Error recovery
+
+### 🆕 Cloudflare D1 Database Access (Two Approaches)
+
+We provide **two complementary approaches** for accessing Cloudflare D1 databases:
+
+#### Approach 1: MCP Cloudflare Server
+Protocol-based integration for real-time agent operations.
+
+**Setup:**
+```json
+{
+  "mcpServers": {
+    "cloudflare": {
+      "type": "sse",
+      "url": "https://bindings.mcp.cloudflare.com/sse",
+      "headers": {
+        "Authorization": "Bearer YOUR_CLOUDFLARE_API_TOKEN"
+      },
+      "env": {
+        "CLOUDFLARE_ACCOUNT_ID": "YOUR_ACCOUNT_ID"
+      }
+    }
+  }
+}
+```
+
+**Best for**: Agent integration, real-time operations, multi-database workflows
+
+#### Approach 2: Wrangler CLI Tools
+Direct command-line access via official Cloudflare CLI.
+
+**Location**: `automation/database-tools/`
+- `wrangler-d1.sh` - Bash helper script
+- `wrangler_helper.py` - Python module
+
+**Installation:**
+```bash
+npm install -g wrangler
+export CLOUDFLARE_API_TOKEN="your_token"
+export CLOUDFLARE_ACCOUNT_ID="your_account_id"
+```
+
+**Usage:**
+```bash
+# Bash helper
+./automation/database-tools/wrangler-d1.sh list
+./automation/database-tools/wrangler-d1.sh query core "SELECT * FROM users"
+
+# Python module
+from wrangler_helper import WranglerD1Client
+client = WranglerD1Client()
+result = client.select("core", "users", limit=10)
+```
+
+**Best for**: Scripting, automation, debugging, one-time operations
+
+**📖 Full Guide**: See `docs/guides/cloudflare-d1-access-guide.md` for detailed documentation on both approaches.
 
 ## ⚙️ Automation Scripts
 
