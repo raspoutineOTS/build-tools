@@ -1,117 +1,117 @@
-# Design de Sécurité Passwordless via Messaging
+# Passwordless Security Design via Messaging
 
-## 🔐 Vue d'ensemble
+## 🔐 Overview
 
-Ce document détaille l'approche innovante de sécurité **passwordless** du système Build Tools, qui utilise les plateformes de messaging (WhatsApp, Telegram, etc.) comme canal d'authentification et d'entrée de données, éliminant ainsi le besoin de gérer des login/mots de passe pour les acteurs terrain.
+This document details the **passwordless** security innovation of the Build Tools system, which uses messaging platforms (WhatsApp, Telegram, etc.) as authentication and data entry channels, eliminating the need to manage login/passwords for field actors.
 
-## 🎯 Problématique
+## 🎯 Problem Statement
 
-### Défis Traditionnels de Gestion des Accès
+### Traditional Access Management Challenges
 
-Dans les contextes opérationnels terrain (santé, logistique, humanitaire), la gestion traditionnelle des accès pose plusieurs problèmes:
+In field operational contexts (health, logistics, humanitarian), traditional access management poses several problems:
 
 ```
-❌ Problèmes des Systèmes Traditionnels:
+❌ Traditional System Problems:
 
-1. Gestion des Identifiants
-   • Création manuelle de comptes pour chaque utilisateur
-   • Distribution sécurisée des credentials
-   • Support pour reset de mots de passe oubliés
-   • Rotation régulière des mots de passe
+1. Credential Management
+   • Manual account creation for each user
+   • Secure credential distribution
+   • Support for forgotten password resets
+   • Regular password rotation
 
-2. Formation Utilisateurs
-   • Apprentissage d'une nouvelle interface
-   • Mémorisation de nouveaux identifiants
-   • Procédures de connexion complexes
-   • Barrière technologique pour utilisateurs peu tech-savvy
+2. User Training
+   • Learning a new interface
+   • Memorizing new credentials
+   • Complex login procedures
+   • Technical barrier for non-tech-savvy users
 
-3. Sécurité Opérationnelle
-   • Partage informel de credentials entre collègues
-   • Mots de passe faibles ou réutilisés
-   • Post-its avec mots de passe
-   • Risque de compromission massive si DB compromise
+3. Operational Security
+   • Informal credential sharing between colleagues
+   • Weak or reused passwords
+   • Post-it notes with passwords
+   • Risk of massive compromise if DB compromised
 
 4. Maintenance
-   • Gestion lifecycle des comptes (création/suppression)
-   • Gestion des permissions et rôles
-   • Audit trail des accès
-   • Infrastructure d'authentification à maintenir
+   • Account lifecycle management (creation/deletion)
+   • Permission and role management
+   • Access audit trail
+   • Authentication infrastructure to maintain
 ```
 
-## ✅ Solution: Sécurité par Design avec Messaging
+## ✅ Solution: Security by Design with Messaging
 
-### Principe Fondamental
+### Fundamental Principle
 
-**Au lieu de créer un nouveau système d'authentification, nous utilisons l'authentification déjà établie des plateformes de messaging.**
+**Instead of creating a new authentication system, we use the already-established authentication of messaging platforms.**
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│        DESIGN PASSWORDLESS VIA MESSAGING                     │
+│        PASSWORDLESS DESIGN VIA MESSAGING                     │
 └─────────────────────────────────────────────────────────────┘
 
-   Acteur Terrain
+   Field Actor
         │
-        │ Utilise application déjà installée
+        │ Uses already installed app
         │ (WhatsApp, Telegram, etc.)
         ▼
    ┌──────────────────────┐
-   │  Messaging Platform  │ ← Authentification déléguée
-   │  • WhatsApp          │   • 2FA natif (SMS/biométrie)
-   │  • Telegram          │   • Numéro téléphone vérifié
+   │  Messaging Platform  │ ← Delegated authentication
+   │  • WhatsApp          │   • Native 2FA (SMS/biometric)
+   │  • Telegram          │   • Verified phone number
    │  • Signal            │   • End-to-end encryption
    └──────────┬───────────┘
               │
-              │ Message sécurisé
+              │ Secure message
               ▼
    ┌──────────────────────┐
-   │  Messaging Bridge    │ ← Validation identité
-   │  (MCP Server)        │   • Whitelist numéros
-   └──────────┬───────────┘   • Validation format
+   │  Messaging Bridge    │ ← Identity validation
+   │  (MCP Server)        │   • Number whitelist
+   └──────────┬───────────┘   • Format validation
               │
-              │ Données structurées
+              │ Structured data
               ▼
    ┌──────────────────────┐
-   │   System Core        │ ← Traitement sécurisé
+   │   System Core        │ ← Secure processing
    │  • Agents            │
    │  • Databases         │
    └──────────────────────┘
 ```
 
-## 🏗️ Architecture de Sécurité
+## 🏗️ Security Architecture
 
-### Layer 1: Identity Verification (Délégation)
+### Layer 1: Identity Verification (Delegation)
 
 **Design Pattern**: Identity Provider Delegation
 
 ```python
-# Pseudo-code de vérification d'identité
+# Identity verification pseudo-code
 
 class IdentityVerifier:
-    """Vérifie l'identité via la plateforme de messaging"""
+    """Verifies identity via messaging platform"""
 
     def __init__(self):
-        # Whitelist des identités autorisées
+        # Whitelist of authorized identities
         self.authorized_users = self.load_authorized_users()
 
     def verify_message(self, message: IncomingMessage) -> VerificationResult:
         """
-        Vérifie l'identité de l'expéditeur via le messaging platform
+        Verifies sender's identity via messaging platform
 
-        La plateforme (WhatsApp/Telegram) a déjà:
-        - Vérifié le numéro de téléphone (SMS)
-        - Authentifié l'utilisateur (2FA, biométrie)
-        - Chiffré le message (E2E encryption)
+        The platform (WhatsApp/Telegram) has already:
+        - Verified phone number (SMS)
+        - Authenticated the user (2FA, biometric)
+        - Encrypted the message (E2E encryption)
 
-        Nous vérifions seulement:
-        - L'utilisateur est dans la whitelist
-        - Le format du message est valide
+        We only verify:
+        - User is in the whitelist
+        - Message format is valid
         """
 
-        # 1. Extraction identité (fournie par la plateforme)
-        sender_id = message.sender_phone  # Déjà vérifié par WhatsApp/Telegram
+        # 1. Identity extraction (provided by platform)
+        sender_id = message.sender_phone  # Already verified by WhatsApp/Telegram
         sender_platform = message.platform
 
-        # 2. Vérification whitelist
+        # 2. Whitelist verification
         if not self.is_authorized(sender_id, sender_platform):
             self.log_unauthorized_attempt(sender_id)
             return VerificationResult(
@@ -119,7 +119,7 @@ class IdentityVerifier:
                 reason="User not in whitelist"
             )
 
-        # 3. Enrichissement avec métadonnées
+        # 3. Enrichment with metadata
         user_profile = self.get_user_profile(sender_id)
 
         return VerificationResult(
@@ -132,24 +132,24 @@ class IdentityVerifier:
 
     def is_authorized(self, phone: str, platform: str) -> bool:
         """
-        Vérifie si l'utilisateur est autorisé
+        Checks if user is authorized
 
-        Note: Pas de mot de passe à vérifier!
-        La plateforme a déjà authentifié l'utilisateur.
+        Note: No password to verify!
+        The platform has already authenticated the user.
         """
         key = f"{platform}:{phone}"
         return key in self.authorized_users
 ```
 
-**Avantages du Design**:
-- ✅ **Zero Password Management**: Pas de BDD de mots de passe à sécuriser
-- ✅ **Strong Authentication**: 2FA natif des plateformes (SMS, biométrie)
-- ✅ **User Familiarity**: Interface déjà connue des utilisateurs
-- ✅ **No Training Required**: Pas de formation nécessaire sur l'authentification
+**Design Advantages**:
+- ✅ **Zero Password Management**: No password database to secure
+- ✅ **Strong Authentication**: Native 2FA from platforms (SMS, biometric)
+- ✅ **User Familiarity**: Interface already known to users
+- ✅ **No Training Required**: No authentication training needed
 
-### Layer 2: Authorization (Permissions Granulaires)
+### Layer 2: Authorization (Granular Permissions)
 
-**Design Pattern**: Role-Based Access Control (RBAC) simplifié
+**Design Pattern**: Simplified Role-Based Access Control (RBAC)
 
 ```json
 {
@@ -196,11 +196,11 @@ class IdentityVerifier:
 }
 ```
 
-**Validation des permissions**:
+**Permission validation**:
 
 ```python
 class PermissionValidator:
-    """Valide les permissions basées sur le rôle"""
+    """Validates permissions based on role"""
 
     def validate_action(
         self,
@@ -209,10 +209,10 @@ class PermissionValidator:
         resource: str
     ) -> bool:
         """
-        Vérifie si l'utilisateur peut effectuer l'action
+        Checks if user can perform action
 
-        Pas de session à gérer!
-        Chaque message est vérifié indépendamment.
+        No session to manage!
+        Each message is verified independently.
         """
 
         # Check domain permission
@@ -234,7 +234,7 @@ class PermissionValidator:
         return True
 
     def check_constraints(self, user: VerifiedUser) -> bool:
-        """Vérifie les contraintes (rate limiting, horaires, etc.)"""
+        """Checks constraints (rate limiting, hours, etc.)"""
 
         # Rate limiting
         today_submissions = self.count_submissions_today(user.id)
@@ -254,11 +254,11 @@ class PermissionValidator:
         return True
 ```
 
-**Avantages**:
-- ✅ **Granular Permissions**: Contrôle précis par domaine et action
-- ✅ **No Session Management**: Pas de cookies, tokens, ou sessions
-- ✅ **Rate Limiting**: Protection contre abus
-- ✅ **Audit Trail**: Chaque action traçable à un numéro de téléphone
+**Advantages**:
+- ✅ **Granular Permissions**: Precise control per domain and action
+- ✅ **No Session Management**: No cookies, tokens, or sessions
+- ✅ **Rate Limiting**: Protection against abuse
+- ✅ **Audit Trail**: Every action traceable to phone number
 
 ### Layer 3: Data Security
 
@@ -274,15 +274,15 @@ class PermissionValidator:
 │  │ End-to-End Encryption (E2E)            │                │
 │  │ • WhatsApp: Signal Protocol            │                │
 │  │ • Telegram: MTProto (secret chats)     │                │
-│  │ • Messages chiffrés de bout en bout    │                │
+│  │ • End-to-end encrypted messages        │                │
 │  └────────────────────────────────────────┘                │
 │            ↓                                                 │
 │  Layer 3.2: API Security                                    │
 │  ┌────────────────────────────────────────┐                │
 │  │ Messaging Bridge ↔ Core System         │                │
-│  │ • TLS 1.3 obligatoire                  │                │
+│  │ • TLS 1.3 required                     │                │
 │  │ • Certificate pinning                  │                │
-│  │ • API keys rotation automatique        │                │
+│  │ • Automatic API key rotation           │                │
 │  └────────────────────────────────────────┘                │
 │            ↓                                                 │
 │  Layer 3.3: Data at Rest                                    │
@@ -310,7 +310,7 @@ class PermissionValidator:
 
 ```python
 class AuditLogger:
-    """Logging immuable de toutes les actions"""
+    """Immutable logging of all actions"""
 
     def log_action(
         self,
@@ -321,10 +321,10 @@ class AuditLogger:
         result: str
     ):
         """
-        Enregistre chaque action de manière immuable
+        Records each action immutably
 
-        Utilise le numéro de téléphone comme identifiant unique
-        (pas d'email ou username à gérer)
+        Uses phone number as unique identifier
+        (no email or username to manage)
         """
 
         audit_entry = {
@@ -346,16 +346,16 @@ class AuditLogger:
         # Append-only log (immutable)
         self.audit_db.append(audit_entry)
 
-        # Export pour compliance
+        # Export for compliance
         if self.should_export_to_compliance_system():
             self.export_to_compliance(audit_entry)
 ```
 
-**Rapports de compliance**:
+**Compliance reports**:
 
 ```python
 class ComplianceReporter:
-    """Génère rapports pour audits et compliance"""
+    """Generates reports for audits and compliance"""
 
     def generate_access_report(
         self,
@@ -363,12 +363,12 @@ class ComplianceReporter:
         end_date: date
     ) -> Report:
         """
-        Rapport d'accès pour période donnée
+        Access report for given period
 
-        Répond aux questions:
-        - Qui a accédé à quelles données?
-        - Quand et via quelle plateforme?
-        - Quelles actions ont été effectuées?
+        Answers the questions:
+        - Who accessed what data?
+        - When and via which platform?
+        - What actions were performed?
         """
 
         query = """
@@ -386,7 +386,7 @@ class ComplianceReporter:
         return self.generate_report(query, start_date, end_date)
 
     def generate_security_incidents_report(self) -> Report:
-        """Rapport des tentatives non autorisées"""
+        """Report of unauthorized attempts"""
 
         query = """
         SELECT
@@ -397,211 +397,211 @@ class ComplianceReporter:
         FROM audit_log
         WHERE result = 'UNAUTHORIZED'
         GROUP BY date, platform, user_id_hash
-        HAVING COUNT(*) > 5  -- Plus de 5 tentatives
+        HAVING COUNT(*) > 5  -- More than 5 attempts
         """
 
         return self.generate_report(query)
 ```
 
-## 🎨 Comparaison: Traditionnel vs Passwordless
+## 🎨 Comparison: Traditional vs Passwordless
 
-### Flux d'Authentification Traditionnel
+### Traditional Authentication Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│         SYSTÈME TRADITIONNEL (Complexe)                      │
+│         TRADITIONAL SYSTEM (Complex)                         │
 └─────────────────────────────────────────────────────────────┘
 
-1. Création de Compte
-   Admin → Crée compte → Génère password temporaire
-        → Envoie credentials par email/SMS
-        → Utilisateur doit changer password au 1er login
+1. Account Creation
+   Admin → Creates account → Generates temporary password
+        → Sends credentials via email/SMS
+        → User must change password at first login
 
 2. Login
-   User → Accède à l'application web/mobile
-       → Entre username/password
-       → Éventuellement 2FA (SMS code)
-       → Crée session (cookie/token)
-       → Doit se reconnecter régulièrement
+   User → Accesses web/mobile application
+       → Enters username/password
+       → Optionally 2FA (SMS code)
+       → Creates session (cookie/token)
+       → Must reconnect regularly
 
-3. Gestion Continue
-   • Resets de password oubliés
-   • Rotation forcée des passwords (90 jours)
-   • Gestion sessions actives
-   • Révocation tokens
-   • Infrastructure auth (serveur, DB, etc.)
+3. Ongoing Management
+   • Forgotten password resets
+   • Forced password rotation (90 days)
+   • Active session management
+   • Token revocation
+   • Auth infrastructure (server, DB, etc.)
 
-4. Sécurité
+4. Security
    • Hash passwords (bcrypt, argon2)
-   • Sécuriser DB des credentials
-   • Rate limiting sur login
-   • Protection contre brute force
-   • Session management sécurisé
+   • Secure credentials DB
+   • Rate limiting on login
+   • Brute force protection
+   • Secure session management
 
-❌ Complexité: HAUTE
-❌ Formation: NÉCESSAIRE
-❌ Maintenance: CONTINUE
-❌ Surface d'attaque: LARGE
+❌ Complexity: HIGH
+❌ Training: REQUIRED
+❌ Maintenance: CONTINUOUS
+❌ Attack Surface: LARGE
 ```
 
-### Flux Passwordless via Messaging
+### Passwordless Flow via Messaging
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│      SYSTÈME PASSWORDLESS (Simple)                          │
+│      PASSWORDLESS SYSTEM (Simple)                           │
 └─────────────────────────────────────────────────────────────┘
 
 1. Onboarding
-   Admin → Ajoute numéro de téléphone à whitelist
-        → Définit permissions
-        → ✓ TERMINÉ
+   Admin → Adds phone number to whitelist
+        → Defines permissions
+        → ✓ DONE
 
-2. Utilisation
-   User → Ouvre WhatsApp/Telegram (déjà installé)
-       → Envoie message au bot
-       → Reçoit réponse immédiate
-       → Aucun login/password nécessaire
+2. Usage
+   User → Opens WhatsApp/Telegram (already installed)
+       → Sends message to bot
+       → Receives immediate response
+       → No login/password needed
 
-3. Gestion Continue
-   • Modification permissions: update JSON
-   • Révocation accès: suppression de whitelist
-   • Monitoring: audit log automatique
-   • Aucune session à gérer
+3. Ongoing Management
+   • Modify permissions: update JSON
+   • Revoke access: remove from whitelist
+   • Monitoring: automatic audit log
+   • No sessions to manage
 
-4. Sécurité
-   • Authentification déléguée à WhatsApp/Telegram
-   • 2FA natif de la plateforme
-   • E2E encryption par défaut
-   • Pas de credentials à sécuriser
-   • Stateless (pas de session)
+4. Security
+   • Authentication delegated to WhatsApp/Telegram
+   • Native platform 2FA
+   • E2E encryption by default
+   • No credentials to secure
+   • Stateless (no session)
 
-✅ Complexité: FAIBLE
-✅ Formation: AUCUNE
-✅ Maintenance: MINIMALE
-✅ Surface d'attaque: RÉDUITE
+✅ Complexity: LOW
+✅ Training: NONE
+✅ Maintenance: MINIMAL
+✅ Attack Surface: REDUCED
 ```
 
-## 🔥 Avantages du Design Passwordless
+## 🔥 Passwordless Design Advantages
 
-### 1. Sécurité Renforcée
+### 1. Enhanced Security
 
 ```
-Menaces Éliminées:
-✅ Phishing de passwords        → Impossible (pas de password)
-✅ Credential stuffing          → N/A (pas de DB credentials)
-✅ Brute force attacks          → N/A (pas de login form)
-✅ Password reuse              → N/A
-✅ Weak passwords              → N/A
-✅ Social engineering (password) → Limité aux plateformes
+Threats Eliminated:
+✅ Password phishing        → Impossible (no password)
+✅ Credential stuffing      → N/A (no credentials DB)
+✅ Brute force attacks      → N/A (no login form)
+✅ Password reuse           → N/A
+✅ Weak passwords           → N/A
+✅ Social engineering (pwd) → Limited to platforms
 
-Sécurité Héritée des Plateformes:
-✅ 2FA natif (SMS, biométrie)
-✅ Détection d'anomalies par les plateformes
+Security Inherited from Platforms:
+✅ Native 2FA (SMS, biometric)
+✅ Anomaly detection by platforms
 ✅ E2E encryption
-✅ Infrastructure sécurisée (WhatsApp, Telegram)
+✅ Secure infrastructure (WhatsApp, Telegram)
 ```
 
-### 2. Expérience Utilisateur Optimale
+### 2. Optimal User Experience
 
 ```
-Pour les Acteurs Terrain:
+For Field Actors:
 
-✅ Aucune Formation Nécessaire
-   • Utilise application déjà maîtrisée
-   • Interface familière
-   • Pas de nouveau workflow à apprendre
+✅ No Training Required
+   • Uses already mastered application
+   • Familiar interface
+   • No new workflow to learn
 
-✅ Accès Immédiat
-   • Pas de création de compte
-   • Pas de login à mémoriser
-   • Pas de procédure de reset password
+✅ Immediate Access
+   • No account creation
+   • No login to memorize
+   • No password reset procedure
 
-✅ Multi-Device Natural
-   • WhatsApp Web automatique
-   • Synchronisation native
-   • Pas de gestion de sessions multiples
+✅ Natural Multi-Device
+   • Automatic WhatsApp Web
+   • Native synchronization
+   • No multiple session management
 
 ✅ Offline Capability
-   • Messages mis en queue automatiquement
-   • Envoi différé si hors connexion
-   • Pas de "session expired"
+   • Messages queued automatically
+   • Deferred sending if offline
+   • No "session expired"
 ```
 
-### 3. Simplicité Opérationnelle
+### 3. Operational Simplicity
 
 ```
-Pour les Administrateurs:
+For Administrators:
 
-✅ Onboarding Simplifié
-   • Ajout d'un numéro à whitelist (1 ligne JSON)
-   • Définition permissions (configuration)
-   • Pas de création de compte dans système
+✅ Simplified Onboarding
+   • Add number to whitelist (1 JSON line)
+   • Define permissions (configuration)
+   • No account creation in system
 
-✅ Révocation Instantanée
-   • Suppression de whitelist
-   • Effet immédiat (stateless)
-   • Pas de sessions actives à invalider
+✅ Instant Revocation
+   • Remove from whitelist
+   • Immediate effect (stateless)
+   • No active sessions to invalidate
 
-✅ Audit Facilité
-   • Identifiant unique: numéro de téléphone
-   • Traçabilité complète
-   • Rapports de compliance automatiques
+✅ Easy Audit
+   • Unique identifier: phone number
+   • Complete traceability
+   • Automatic compliance reports
 
-✅ Scaling Facile
-   • Aucune infrastructure auth à scaler
-   • Pas de DB sessions à gérer
-   • Stateless = horizontal scaling facile
+✅ Easy Scaling
+   • No auth infrastructure to scale
+   • No session DB to manage
+   • Stateless = easy horizontal scaling
 ```
 
-### 4. Coût Réduit
+### 4. Reduced Costs
 
 ```
-Économies Réalisées:
+Savings Achieved:
 
 💰 Infrastructure
-   ✅ Pas de serveur d'authentification
-   ✅ Pas de DB sessions/tokens
-   ✅ Pas de système de reset password
-   ✅ Pas d'emails transactionnels (reset, etc.)
+   ✅ No authentication server
+   ✅ No sessions/tokens DB
+   ✅ No password reset system
+   ✅ No transactional emails (reset, etc.)
 
 💰 Maintenance
-   ✅ Pas de gestion lifecycle credentials
-   ✅ Pas de rotation passwords
-   ✅ Pas de support "password oublié"
-   ✅ Moins de tickets support
+   ✅ No credential lifecycle management
+   ✅ No password rotation
+   ✅ No "forgotten password" support
+   ✅ Fewer support tickets
 
-💰 Formation
-   ✅ Pas de formation utilisateurs
-   ✅ Pas de documentation auth
-   ✅ Onboarding instantané
+💰 Training
+   ✅ No user training
+   ✅ No auth documentation
+   ✅ Instant onboarding
 
-💰 Sécurité
-   ✅ Moins de surface d'attaque à monitorer
-   ✅ Pas de pentest sur auth (déléguée)
-   ✅ Moins de compliance audit
+💰 Security
+   ✅ Less attack surface to monitor
+   ✅ No pentest on auth (delegated)
+   ✅ Less compliance audit
 ```
 
-## ⚙️ Implémentation
+## ⚙️ Implementation
 
-### Configuration Whitelist
+### Whitelist Configuration
 
 ```json
 {
-  "comment": "Configuration des utilisateurs autorisés",
+  "comment": "Authorized users configuration",
   "version": "1.0",
   "last_updated": "2025-11-04",
 
   "authorized_users": [
     {
-      "comment": "Exemple: Médecin terrain région Nord",
+      "comment": "Example: Field doctor North region",
       "platform": "whatsapp",
       "phone": "+33612345678",
       "user_info": {
         "name": "Dr. Sophie Martin",
         "role": "field_doctor",
         "organization": "MSF",
-        "region": "Nord",
-        "team": "Equipe Alpha"
+        "region": "North",
+        "team": "Team Alpha"
       },
       "permissions": {
         "can_submit_data": true,
@@ -619,11 +619,11 @@ Pour les Administrateurs:
       "notifications": {
         "daily_summary": true,
         "error_alerts": true,
-        "language": "fr"
+        "language": "en"
       }
     },
     {
-      "comment": "Exemple: Manager logistique national",
+      "comment": "Example: National logistics manager",
       "platform": "telegram",
       "phone": "+33687654321",
       "user_info": {
@@ -651,7 +651,7 @@ Pour les Administrateurs:
         "daily_summary": true,
         "weekly_report": true,
         "critical_alerts": true,
-        "language": "fr"
+        "language": "en"
       }
     }
   ],
@@ -666,7 +666,7 @@ Pour les Administrateurs:
 }
 ```
 
-### Messaging Bridge avec Validation
+### Messaging Bridge with Validation
 
 ```python
 # mcp-servers/messaging-bridge/security.py
@@ -678,7 +678,7 @@ from datetime import datetime, timedelta
 
 class PasswordlessAuthenticator:
     """
-    Authenticateur sans password utilisant les plateformes messaging
+    Passwordless authenticator using messaging platforms
     """
 
     def __init__(self, config_path: str):
@@ -690,7 +690,7 @@ class PasswordlessAuthenticator:
         self.audit_logger = AuditLogger()
 
     def _build_user_index(self) -> dict:
-        """Construit index rapide des utilisateurs autorisés"""
+        """Builds fast index of authorized users"""
         index = {}
         for user in self.config["authorized_users"]:
             key = f"{user['platform']}:{user['phone']}"
@@ -702,24 +702,24 @@ class PasswordlessAuthenticator:
         message: IncomingMessage
     ) -> Optional[AuthenticatedUser]:
         """
-        Authentifie un message entrant
+        Authenticates incoming message
 
-        Processus:
-        1. Vérifie que l'utilisateur est dans la whitelist
-        2. Charge ses permissions
-        3. Vérifie les contraintes (rate limiting, horaires)
-        4. Retourne utilisateur authentifié ou None
+        Process:
+        1. Verifies user is in whitelist
+        2. Loads their permissions
+        3. Checks constraints (rate limiting, hours)
+        4. Returns authenticated user or None
 
-        Note: Aucun password vérifié!
-        L'authentification est déléguée à WhatsApp/Telegram.
+        Note: No password verified!
+        Authentication is delegated to WhatsApp/Telegram.
         """
 
         user_key = f"{message.platform}:{message.sender_phone}"
 
-        # Log de la tentative
+        # Log attempt
         self.audit_logger.log_attempt(message)
 
-        # 1. Vérification whitelist
+        # 1. Whitelist verification
         if user_key not in self.authorized_users:
             self.audit_logger.log_unauthorized(message)
             await self._handle_unauthorized(message)
@@ -733,13 +733,13 @@ class PasswordlessAuthenticator:
             await self._notify_rate_limit(message)
             return None
 
-        # 3. Vérification horaires
+        # 3. Time constraints verification
         if not self._check_time_constraints(user_config):
             self.audit_logger.log_outside_hours(message)
             await self._notify_outside_hours(message)
             return None
 
-        # 4. Création de l'utilisateur authentifié
+        # 4. Create authenticated user
         authenticated_user = AuthenticatedUser(
             phone=user_config["phone"],
             platform=message.platform,
@@ -750,44 +750,44 @@ class PasswordlessAuthenticator:
             constraints=user_config["constraints"]
         )
 
-        # Log succès
+        # Log success
         self.audit_logger.log_authenticated(authenticated_user)
 
         return authenticated_user
 
     async def _handle_unauthorized(self, message: IncomingMessage):
-        """Gère les tentatives non autorisées"""
+        """Handles unauthorized attempts"""
 
-        # Compteur de tentatives
+        # Attempt counter
         attempts = self._get_attempt_count(message.sender_phone)
 
         if attempts >= self.config["security_settings"]["max_unauthorized_attempts_before_block"]:
-            # Blocage temporaire
+            # Temporary block
             self._block_user(
                 message.sender_phone,
                 duration_minutes=self.config["security_settings"]["block_duration_minutes"]
             )
 
-            # Alerte administrateurs
+            # Alert administrators
             await self._alert_admins(
                 f"User {message.sender_phone} blocked after {attempts} unauthorized attempts"
             )
 
-        # Message à l'utilisateur (si configuré)
+        # Message to user (if configured)
         if self.config["security_settings"].get("notify_unauthorized", True):
             await self._send_message(
                 message.sender_phone,
                 message.platform,
-                "❌ Accès non autorisé. Contactez un administrateur."
+                "❌ Unauthorized access. Contact an administrator."
             )
 
     def _check_time_constraints(self, user_config: dict) -> bool:
-        """Vérifie les contraintes horaires"""
+        """Checks time constraints"""
 
         allowed_hours = user_config["constraints"]["allowed_hours"]
 
         if allowed_hours == "00:00-23:59":
-            return True  # Pas de restriction
+            return True  # No restriction
 
         start, end = allowed_hours.split("-")
         start_hour = int(start.split(":")[0])
@@ -799,16 +799,16 @@ class PasswordlessAuthenticator:
 
 
 class RateLimiter:
-    """Rate limiting par utilisateur"""
+    """Per-user rate limiting"""
 
     def __init__(self):
         self.request_counts = {}
 
     def check_rate_limit(self, user_key: str, user_config: dict) -> bool:
         """
-        Vérifie le rate limit
+        Checks rate limit
 
-        Implémente token bucket algorithm
+        Implements token bucket algorithm
         """
 
         now = datetime.now()
@@ -823,13 +823,13 @@ class RateLimiter:
 
         user_data = self.request_counts[user_key]
 
-        # Reset window si plus d'une minute
+        # Reset window if more than one minute
         if now - user_data["window_start"] > timedelta(minutes=1):
             user_data["count"] = 1
             user_data["window_start"] = now
             return True
 
-        # Vérification limite
+        # Check limit
         if user_data["count"] >= limit:
             return False
 
@@ -838,29 +838,29 @@ class RateLimiter:
 
 
 class AuditLogger:
-    """Logging immuable pour compliance"""
+    """Immutable logging for compliance"""
 
     def __init__(self):
         self.log_file = "audit/auth.log"
 
     def log_attempt(self, message: IncomingMessage):
-        """Log de toute tentative"""
+        """Log all attempts"""
         self._write_log("ATTEMPT", message)
 
     def log_authenticated(self, user: AuthenticatedUser):
-        """Log d'authentification réussie"""
+        """Log successful authentication"""
         self._write_log("AUTHENTICATED", user)
 
     def log_unauthorized(self, message: IncomingMessage):
-        """Log de tentative non autorisée"""
+        """Log unauthorized attempt"""
         self._write_log("UNAUTHORIZED", message)
 
     def log_rate_limited(self, message: IncomingMessage):
-        """Log de rate limiting"""
+        """Log rate limiting"""
         self._write_log("RATE_LIMITED", message)
 
     def _write_log(self, event_type: str, data):
-        """Écriture immuable (append-only)"""
+        """Immutable write (append-only)"""
 
         log_entry = {
             "timestamp": datetime.utcnow().isoformat(),
@@ -879,31 +879,31 @@ class AuditLogger:
 
     @staticmethod
     def _hash_phone(phone: str) -> str:
-        """Hash du numéro pour privacy"""
+        """Hash number for privacy"""
         return hashlib.sha256(phone.encode()).hexdigest()[:16]
 ```
 
 ## 🎓 Best Practices
 
-### 1. Gestion de la Whitelist
+### 1. Whitelist Management
 
 ```bash
 #!/bin/bash
 # scripts/manage-whitelist.sh
 
-# Ajouter un utilisateur
+# Add user
 add_user() {
     local phone=$1
     local role=$2
     local platform=${3:-"whatsapp"}
 
-    # Validation format téléphone
+    # Phone format validation
     if ! validate_phone "$phone"; then
-        echo "❌ Format téléphone invalide"
+        echo "❌ Invalid phone format"
         exit 1
     fi
 
-    # Génération config
+    # Generate config
     cat >> config/whitelist.json <<EOF
     {
       "platform": "$platform",
@@ -918,128 +918,128 @@ add_user() {
     },
 EOF
 
-    echo "✅ Utilisateur ajouté: $phone ($role)"
-    echo "⚠️  N'oubliez pas de mettre à jour les informations TODO"
+    echo "✅ User added: $phone ($role)"
+    echo "⚠️  Don't forget to update TODO information"
 }
 
-# Révoquer un utilisateur
+# Revoke user
 revoke_user() {
     local phone=$1
 
-    # Suppression de la whitelist
+    # Remove from whitelist
     jq "del(.authorized_users[] | select(.phone == \"$phone\"))" \
         config/whitelist.json > config/whitelist.json.tmp
     mv config/whitelist.json.tmp config/whitelist.json
 
-    # Log de révocation
+    # Log revocation
     echo "$(date -Iseconds) - Revoked: $phone" >> logs/revocations.log
 
     # Reload configuration
     reload_config
 
-    echo "✅ Accès révoqué pour: $phone"
+    echo "✅ Access revoked for: $phone"
 }
 
-# Lister les utilisateurs
+# List users
 list_users() {
     jq -r '.authorized_users[] | "\(.phone) - \(.user_info.name) - \(.user_info.role)"' \
         config/whitelist.json
 }
 ```
 
-### 2. Monitoring et Alertes
+### 2. Monitoring and Alerts
 
 ```python
 # monitoring/security_monitor.py
 
 class SecurityMonitor:
-    """Monitoring des événements de sécurité"""
+    """Security event monitoring"""
 
     async def monitor_unauthorized_attempts(self):
-        """Détecte patterns d'attaques"""
+        """Detects attack patterns"""
 
-        # Analyse des logs
+        # Log analysis
         recent_unauthorized = self.get_recent_unauthorized_attempts(hours=1)
 
-        # Détection de patterns
+        # Pattern detection
         if len(recent_unauthorized) > 10:
-            # Possible attaque en cours
+            # Possible ongoing attack
             await self.alert_admins(
                 "⚠️ SECURITY ALERT: Multiple unauthorized attempts detected",
                 severity="HIGH",
                 details=recent_unauthorized
             )
 
-        # Détection de tentatives répétées d'un même numéro
+        # Detection of repeated attempts from same number
         phone_attempts = self.group_by_phone(recent_unauthorized)
         for phone, attempts in phone_attempts.items():
             if len(attempts) > 5:
-                # Blocage automatique
+                # Automatic blocking
                 await self.auto_block_phone(phone, duration_hours=24)
                 await self.alert_admins(
                     f"🚫 AUTO-BLOCKED: {phone} after {len(attempts)} attempts"
                 )
 
     async def monitor_rate_limits(self):
-        """Monitoring des rate limits atteints"""
+        """Monitoring rate limits reached"""
 
         rate_limited_users = self.get_rate_limited_users(hours=1)
 
         if len(rate_limited_users) > 5:
-            # Plusieurs utilisateurs rate limited = possible problème
+            # Multiple users rate limited = possible issue
             await self.alert_admins(
                 "⚠️ Multiple users hitting rate limits",
                 details=rate_limited_users
             )
 ```
 
-### 3. Migration d'un Système Existant
+### 3. Migration from Existing System
 
-Si vous avez déjà un système avec login/password:
+If you already have a system with login/password:
 
 ```
-Plan de Migration:
+Migration Plan:
 
-Phase 1: Dual Mode (2-4 semaines)
-  • Déployer système messaging en parallèle
-  • Permettre auth via messaging OU login traditionnel
-  • Former early adopters sur messaging
-  • Monitoring adoption
+Phase 1: Dual Mode (2-4 weeks)
+  • Deploy messaging system in parallel
+  • Allow auth via messaging OR traditional login
+  • Train early adopters on messaging
+  • Monitor adoption
 
-Phase 2: Migration Progressive (4-8 semaines)
-  • Inciter migration vers messaging (UX supérieure)
-  • Désactiver création de nouveaux comptes traditionnels
-  • Support uniquement pour utilisateurs existants
-  • Formation terrain par vagues
+Phase 2: Progressive Migration (4-8 weeks)
+  • Encourage migration to messaging (superior UX)
+  • Disable new traditional account creation
+  • Support only for existing users
+  • Field training in waves
 
-Phase 3: Décommissionnement (2-4 semaines)
-  • Annoncer date de fin du système traditionnel
-  • Migration forcée utilisateurs restants
-  • Désactivation auth traditionnelle
-  • Décommissionnement infrastructure auth
+Phase 3: Decommissioning (2-4 weeks)
+  • Announce traditional system end date
+  • Force migration of remaining users
+  • Disable traditional auth
+  • Decommission auth infrastructure
 
-Économies réalisées post-migration:
-  ✅ Infrastructure auth (serveurs, DB)
-  ✅ Coûts de support (resets password, etc.)
-  ✅ Complexité opérationnelle
+Savings achieved post-migration:
+  ✅ Auth infrastructure (servers, DB)
+  ✅ Support costs (password resets, etc.)
+  ✅ Operational complexity
 ```
 
 ## 🎯 Conclusion
 
-Le design passwordless via messaging offre:
+Passwordless design via messaging offers:
 
-✅ **Sécurité Supérieure**: Pas de passwords à compromettre
-✅ **Simplicité Extrême**: Aucune formation nécessaire
-✅ **Adoption Rapide**: Interface déjà connue
-✅ **Coûts Réduits**: Moins d'infrastructure et support
-✅ **Scalabilité**: Stateless, horizontal scaling facile
-✅ **Compliance**: Audit trail complet
-✅ **UX Optimale**: Expérience utilisateur fluide
+✅ **Superior Security**: No passwords to compromise
+✅ **Extreme Simplicity**: No training required
+✅ **Rapid Adoption**: Interface already known
+✅ **Reduced Costs**: Less infrastructure and support
+✅ **Scalability**: Stateless, easy horizontal scaling
+✅ **Compliance**: Complete audit trail
+✅ **Optimal UX**: Fluid user experience
 
-**Ce design transforme une complexité (authentification) en simplicité (messaging).**
+**This design transforms complexity (authentication) into simplicity (messaging).**
 
 ---
 
-**Auteur**: Build Tools Team
-**Dernière mise à jour**: 2025-11-04
+**Author**: Build Tools Team
+**Last Updated**: 2025-11-04
 **Version**: 1.0
