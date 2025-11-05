@@ -1,38 +1,38 @@
-# Design du Processus de Build
+# Build Process Design
 
-## 🏗️ Vue d'ensemble du Build System
+## 🏗️ Build System Overview
 
-Ce document détaille la conception du système de build, les processus de compilation, de déploiement et de gestion des dépendances pour le toolkit Build Tools.
+This document details the design of the build system, compilation processes, deployment, and dependency management for the Build Tools toolkit.
 
-## 🎯 Philosophie du Build
+## 🎯 Build Philosophy
 
-### Principes Directeurs
+### Guiding Principles
 
-1. **Reproductibilité**
-   - Builds identiques quel que soit l'environnement
-   - Gestion stricte des versions de dépendances
-   - Lock files pour Python et Node.js
-   - Containerisation pour isolation
+1. **Reproducibility**
+   - Identical builds regardless of environment
+   - Strict dependency version management
+   - Lock files for Python and Node.js
+   - Containerization for isolation
 
-2. **Rapidité**
-   - Builds incrémentaux
-   - Cache agressif des dépendances
-   - Parallélisation des tâches
-   - Skipping des étapes non modifiées
+2. **Speed**
+   - Incremental builds
+   - Aggressive dependency caching
+   - Task parallelization
+   - Skipping unchanged steps
 
-3. **Simplicité**
-   - Installation en une commande
-   - Configuration minimale requise
-   - Defaults intelligents
-   - Auto-détection de l'environnement
+3. **Simplicity**
+   - One-command installation
+   - Minimal configuration required
+   - Smart defaults
+   - Automatic environment detection
 
-4. **Fiabilité**
-   - Validation à chaque étape
-   - Tests automatisés
-   - Rollback facile
-   - Health checks post-déploiement
+4. **Reliability**
+   - Validation at each step
+   - Automated testing
+   - Easy rollback
+   - Post-deployment health checks
 
-## 🔧 Architecture du Build System
+## 🔧 Build System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -54,7 +54,7 @@ Ce document détaille la conception du système de build, les processus de compi
    └──────────────┬─────────────────────────────┘
                   │
    ┌──────────────▼─────────────────────────────┐
-   │  3. COMPILATION (si nécessaire)             │
+   │  3. COMPILATION (if necessary)              │
    │  • TypeScript → JavaScript                  │
    │  • Python bytecode compilation              │
    │  • Binary building (Go WhatsApp bridge)     │
@@ -64,7 +64,7 @@ Ce document détaille la conception du système de build, les processus de compi
    │  4. TESTING                                 │
    │  • Unit tests                               │
    │  • Integration tests                        │
-   │  • E2E tests (optionnel)                    │
+   │  • E2E tests (optional)                     │
    └──────────────┬─────────────────────────────┘
                   │
    ┌──────────────▼─────────────────────────────┐
@@ -82,21 +82,21 @@ Ce document détaille la conception du système de build, les processus de compi
    └────────────────────────────────────────────┘
 ```
 
-## 📦 Gestion des Dépendances
+## 📦 Dependency Management
 
-### Design Multi-Language
+### Multi-Language Design
 
-Le projet utilise plusieurs langages, nécessitant une stratégie de gestion de dépendances sophistiquée.
+The project uses multiple languages, requiring a sophisticated dependency management strategy.
 
 #### Python Dependencies
 
-**Choix**: `uv` comme gestionnaire de paquets principal
+**Choice**: `uv` as the primary package manager
 
-**Raisons du choix**:
-- ✅ 10-100x plus rapide que pip
-- ✅ Resolution de dépendances intelligente
-- ✅ Compatible avec pip (requirements.txt)
-- ✅ Gestion de virtualenv intégrée
+**Reasons for choice**:
+- ✅ 10-100x faster than pip
+- ✅ Intelligent dependency resolution
+- ✅ Compatible with pip (requirements.txt)
+- ✅ Integrated virtualenv management
 
 **Structure**:
 
@@ -150,13 +150,13 @@ echo "✓ Python dependencies installed"
 ```
 
 **Design Pattern**: Fallback Strategy
-- Préférence pour l'outil le plus performant
-- Fallback automatique si non disponible
-- Compilation bytecode pour optimisation runtime
+- Preference for the most performant tool
+- Automatic fallback if unavailable
+- Bytecode compilation for runtime optimization
 
 #### Node.js Dependencies
 
-**Choix**: `npm` avec support `yarn` optionnel
+**Choice**: `npm` with optional `yarn` support
 
 **Structure**:
 
@@ -218,13 +218,13 @@ echo "✓ Node.js dependencies installed"
 ```
 
 **Design Pattern**: Version Checking + Lock File Respect
-- Validation des versions minimales
-- Utilisation des lock files pour reproductibilité
-- Support multi-gestionnaire (npm/yarn)
+- Minimal version validation
+- Use lock files for reproducibility
+- Multi-manager support (npm/yarn)
 
 #### System Dependencies
 
-**Choix**: Scripts shell avec détection OS automatique
+**Choice**: Shell scripts with automatic OS detection
 
 ```bash
 #!/bin/bash
@@ -271,15 +271,15 @@ echo "✓ System dependencies installed"
 ```
 
 **Design Pattern**: Platform Abstraction
-- Détection automatique de l'OS
-- Abstraction du gestionnaire de paquets
-- Installation uniforme cross-platform
+- Automatic OS detection
+- Package manager abstraction
+- Uniform cross-platform installation
 
 ## 🔨 Build Process Design
 
 ### Master Build Script
 
-**Design**: Script maître orchestrant toutes les étapes
+**Design**: Master script orchestrating all steps
 
 ```bash
 #!/bin/bash
@@ -372,15 +372,15 @@ main "$@"
 ```
 
 **Design Patterns**:
-- **Pipeline Pattern**: Étapes séquentielles avec validation
-- **Fail-Fast**: Arrêt immédiat en cas d'erreur
-- **Logging Structure**: Output formaté et coloré
-- **Time Tracking**: Mesure de performance
-- **Trap Handling**: Gestion d'erreurs élégante
+- **Pipeline Pattern**: Sequential steps with validation
+- **Fail-Fast**: Immediate stop on error
+- **Structured Logging**: Formatted and colored output
+- **Time Tracking**: Performance measurement
+- **Trap Handling**: Elegant error management
 
 ### Incremental Build Design
 
-**Objectif**: Éviter la reconstruction inutile
+**Objective**: Avoid unnecessary rebuilds
 
 ```bash
 #!/bin/bash
@@ -432,10 +432,10 @@ build_incremental() {
 
 **Design Pattern**: Change Detection
 - Hash-based change tracking
-- Component-level granularité
-- Cached builds pour rapidité
+- Component-level granularity
+- Cached builds for speed
 
-## 🧪 Testing dans le Build
+## 🧪 Testing in the Build
 
 ### Test Strategy Design
 
@@ -541,19 +541,19 @@ main "$@"
 ```
 
 **Design Patterns**:
-- **Test Pyramid**: Distribution optimale des tests
-- **Parallel Execution**: Tests indépendants en parallèle
-- **Service Orchestration**: Docker Compose pour tests d'intégration
-- **Conditional Execution**: E2E optionnels pour CI/dev
+- **Test Pyramid**: Optimal test distribution
+- **Parallel Execution**: Independent tests in parallel
+- **Service Orchestration**: Docker Compose for integration tests
+- **Conditional Execution**: Optional E2E for CI/dev
 
 ## 📦 Packaging Design
 
 ### Docker Multi-Stage Build
 
-**Design**: Builds optimisés multi-étapes
+**Design**: Optimized multi-stage builds
 
 ```dockerfile
-# Dockerfile pour MCP Server
+# Dockerfile for MCP Server
 FROM python:3.11-slim as base
 
 # Stage 1: Dependencies
@@ -587,14 +587,14 @@ CMD ["python", "mcp-servers/messaging-bridge/server.py"]
 ```
 
 **Design Patterns**:
-- **Multi-Stage Build**: Séparation build/runtime pour taille minimale
-- **Layer Caching**: Optimisation du cache Docker
+- **Multi-Stage Build**: Build/runtime separation for minimal size
+- **Layer Caching**: Docker cache optimization
 - **Security**: Non-root user, minimal base image
-- **Health Checks**: Monitoring intégré
+- **Health Checks**: Integrated monitoring
 
 ### Configuration Packaging
 
-**Design**: Bundling des configurations
+**Design**: Configuration bundling
 
 ```bash
 #!/bin/bash
@@ -634,9 +634,9 @@ echo "✓ Configuration package created"
 ```
 
 **Design Pattern**: Template Processing
-- Variables d'environnement substituées
-- Configuration par environnement (dev/staging/prod)
-- Versioning des packages
+- Environment variables substituted
+- Configuration per environment (dev/staging/prod)
+- Package versioning
 
 ## 🚀 Deployment Design
 
@@ -833,10 +833,10 @@ main "$@"
 ```
 
 **Design Patterns**:
-- **Strategy Pattern**: Choix de stratégie de déploiement
-- **Pre/Post Hooks**: Validation avant et après
-- **Progressive Rollout**: Déploiement progressif avec monitoring
-- **Auto Rollback**: Rollback automatique en cas d'erreur
+- **Strategy Pattern**: Deployment strategy selection
+- **Pre/Post Hooks**: Validation before and after
+- **Progressive Rollout**: Progressive deployment with monitoring
+- **Auto Rollback**: Automatic rollback on error
 
 ## 🔍 Build Monitoring & Observability
 
@@ -887,14 +887,14 @@ EOF
 }
 ```
 
-**Métriques clés trackées**:
-- Durée totale et par étape
-- Taille et nombre d'artifacts
-- Résultats des tests et couverture
-- Taux de hit du cache
+**Key metrics tracked**:
+- Total and per-stage duration
+- Artifact size and count
+- Test results and coverage
+- Cache hit rate
 - Resource utilization
 
-## 🔐 Security dans le Build
+## 🔐 Security in the Build
 
 ### Security Scanning
 
@@ -994,7 +994,7 @@ build_parallel() {
 
 **Optimizations**:
 - Multi-level caching
-- Parallel builds des composants indépendants
+- Parallel builds of independent components
 - Incremental builds
 - Build artifact reuse
 
@@ -1060,10 +1060,10 @@ jobs:
 ```
 
 **CI/CD Features**:
-- Automated builds sur push
-- Tests automatisés
+- Automated builds on push
+- Automated testing
 - Security scanning
-- Déploiement automatique (staging/prod)
+- Automatic deployment (staging/prod)
 - Cache optimization
 
 ## 📚 Build Documentation
@@ -1092,18 +1092,18 @@ build-tools/
 
 ## 🎓 Conclusion
 
-Le design du build system privilégie:
+The build system design prioritizes:
 
-✅ **Reproductibilité**: Builds identiques partout
-✅ **Performance**: Caching, parallélisation, incremental builds
-✅ **Sécurité**: Scanning, validation, isolation
-✅ **Observabilité**: Metrics, logging, tracing
-✅ **Automatisation**: CI/CD complet
-✅ **Simplicité**: Scripts clairs, configuration minimale
-✅ **Fiabilité**: Validation multi-niveaux, rollback facile
+✅ **Reproducibility**: Identical builds everywhere
+✅ **Performance**: Caching, parallelization, incremental builds
+✅ **Security**: Scanning, validation, isolation
+✅ **Observability**: Metrics, logging, tracing
+✅ **Automation**: Complete CI/CD
+✅ **Simplicity**: Clear scripts, minimal configuration
+✅ **Reliability**: Multi-level validation, easy rollback
 
 ---
 
-**Auteur**: Build Tools Team
-**Dernière mise à jour**: 2025-11-04
+**Author**: Build Tools Team
+**Last Updated**: 2025-11-04
 **Version**: 1.0
