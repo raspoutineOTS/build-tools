@@ -1,38 +1,38 @@
-# Architecture et Design du Système Build Tools
+# Architecture and System Design
 
-## 📐 Vue d'ensemble de l'architecture
+## 📐 Architecture Overview
 
-Ce document détaille la conception architecturale du système Build Tools, expliquant les choix de design, les patterns utilisés, et la philosophie de construction de ce toolkit d'automation.
+This document details the architectural design of the Build Tools system, explaining design choices, patterns used, and the construction philosophy of this automation toolkit.
 
-## 🎯 Philosophie de Design
+## 🎯 Design Philosophy
 
-### Principes Fondamentaux
+### Fundamental Principles
 
-1. **Modularité**
-   - Chaque composant est indépendant et réutilisable
-   - Couplage faible entre les modules
-   - Interfaces bien définies pour l'interopérabilité
-   - Possibilité d'utiliser chaque outil séparément
+1. **Modularity**
+   - Each component is independent and reusable
+   - Loose coupling between modules
+   - Well-defined interfaces for interoperability
+   - Ability to use each tool separately
 
-2. **Extensibilité**
-   - Architecture plugin pour ajouter de nouveaux composants
-   - Configuration driven plutôt que code-driven
-   - Points d'extension clairement définis
-   - Support de multiples implémentations (providers)
+2. **Extensibility**
+   - Plugin architecture for adding new components
+   - Configuration-driven rather than code-driven
+   - Clearly defined extension points
+   - Support for multiple implementations (providers)
 
-3. **Interopérabilité**
-   - Standard MCP (Model Context Protocol) comme couche d'intégration
-   - APIs uniformes entre composants
-   - Support multi-plateformes (messaging, databases, etc.)
-   - Communication asynchrone pour la scalabilité
+3. **Interoperability**
+   - MCP (Model Context Protocol) standard as integration layer
+   - Uniform APIs between components
+   - Multi-platform support (messaging, databases, etc.)
+   - Asynchronous communication for scalability
 
-4. **Robustesse**
-   - Gestion d'erreurs gracieuse avec fallbacks
-   - Retry logic pour les opérations réseau
-   - Validation des données à chaque étape
-   - Logging complet pour le debugging
+4. **Robustness**
+   - Graceful error handling with fallbacks
+   - Retry logic for network operations
+   - Data validation at each step
+   - Comprehensive logging for debugging
 
-## 🏗️ Architecture Globale
+## 🏗️ Global Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -81,21 +81,21 @@ Ce document détaille la conception architecturale du système Build Tools, expl
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## 🔧 Design des Composants
+## 🔧 Component Design
 
 ### 1. Agent Layer - Design Pattern: Delegation
 
-**Objectif**: Fournir une interface intelligente entre l'utilisateur et les services
+**Objective**: Provide intelligent interface between user and services
 
-**Pattern utilisé**: Agent-based Delegation Pattern
-- Chaque agent est spécialisé dans un domaine
-- Communication inter-agent via orchestrateur
-- Contexte partagé pour la cohérence
+**Pattern used**: Agent-based Delegation Pattern
+- Each agent specialized in a domain
+- Inter-agent communication via orchestrator
+- Shared context for consistency
 
-**Design des Agents**:
+**Agent Design**:
 
 ```python
-# Pseudo-architecture d'un agent
+# Agent pseudo-architecture
 class BaseAgent:
     def __init__(self, mcp_clients: Dict[str, MCPClient]):
         self.mcp_clients = mcp_clients
@@ -105,49 +105,49 @@ class BaseAgent:
         # 1. Validation
         validated = self.validate_request(request)
 
-        # 2. Enrichissement du contexte
+        # 2. Context enrichment
         context = await self.enrich_context(validated)
 
-        # 3. Délégation aux MCP appropriés
+        # 3. Delegation to appropriate MCP
         results = await self.delegate_to_mcp(context)
 
-        # 4. Agrégation et formatage
+        # 4. Aggregation and formatting
         response = self.format_response(results)
 
         return response
 ```
 
-**Avantages du design**:
-- ✅ Séparation des préoccupations (SoC)
-- ✅ Testabilité indépendante
-- ✅ Évolution sans impact sur autres composants
-- ✅ Réutilisabilité du code
+**Design advantages**:
+- ✅ Separation of Concerns (SoC)
+- ✅ Independent testability
+- ✅ Evolution without impacting other components
+- ✅ Code reusability
 
 ### 2. MCP Server Layer - Design Pattern: Adapter + Facade
 
-**Objectif**: Uniformiser l'accès aux services externes hétérogènes
+**Objective**: Unify access to heterogeneous external services
 
-**Pattern utilisé**: Adapter Pattern + Facade Pattern
-- Adapter: Convertit les APIs externes en interfaces uniformes
-- Facade: Simplifie l'utilisation de systèmes complexes
+**Pattern used**: Adapter Pattern + Facade Pattern
+- Adapter: Converts external APIs to uniform interfaces
+- Facade: Simplifies usage of complex systems
 
-**Design du MCP Server**:
+**MCP Server Design**:
 
 ```python
-# Architecture d'un MCP Server
+# MCP Server architecture
 class MCPServer:
     def __init__(self):
         self.adapters: Dict[str, ServiceAdapter] = {}
         self.connection_pool = ConnectionPool()
 
     async def handle_request(self, tool: str, params: Dict):
-        # 1. Router vers le bon adapter
+        # 1. Route to appropriate adapter
         adapter = self.get_adapter(tool)
 
         # 2. Connection pooling
         connection = await self.connection_pool.acquire()
 
-        # 3. Exécution avec retry logic
+        # 3. Execute with retry logic
         try:
             result = await self.execute_with_retry(
                 adapter, connection, params
@@ -157,34 +157,34 @@ class MCPServer:
 
         return result
 
-# Exemple d'adapter
+# Adapter example
 class WhatsAppAdapter(ServiceAdapter):
-    """Adapte l'API WhatsApp au standard MCP"""
+    """Adapts WhatsApp API to MCP standard"""
 
     async def get_messages(self, params):
-        # Conversion format WhatsApp -> format MCP uniforme
+        # Convert WhatsApp format -> uniform MCP format
         raw_messages = await self.whatsapp_client.fetch()
         return self.normalize_messages(raw_messages)
 ```
 
-**Avantages du design**:
-- ✅ Interface uniforme malgré services hétérogènes
-- ✅ Facilite l'ajout de nouveaux services
-- ✅ Abstraction des complexités externes
-- ✅ Connection pooling centralisé
+**Design advantages**:
+- ✅ Uniform interface despite heterogeneous services
+- ✅ Easy addition of new services
+- ✅ Abstraction of external complexities
+- ✅ Centralized connection pooling
 
 ### 3. Automation Layer - Design Pattern: Observer + Strategy
 
-**Objectif**: Automatiser les workflows sans intervention manuelle
+**Objective**: Automate workflows without manual intervention
 
-**Pattern utilisé**:
-- Observer Pattern: Pour la surveillance (monitoring)
-- Strategy Pattern: Pour les actions configurables
+**Pattern used**:
+- Observer Pattern: For monitoring
+- Strategy Pattern: For configurable actions
 
-**Design du système d'automation**:
+**Automation system design**:
 
 ```bash
-# Architecture du Smart Monitor
+# Smart Monitor architecture
 ┌─────────────────────┐
 │   Configuration     │
 │   (JSON/YAML)       │
@@ -207,7 +207,7 @@ class WhatsAppAdapter(ServiceAdapter):
 └─────────────────────┘
 ```
 
-**Exemple de configuration**:
+**Configuration example**:
 
 ```json
 {
@@ -232,25 +232,25 @@ class WhatsAppAdapter(ServiceAdapter):
 }
 ```
 
-**Avantages du design**:
-- ✅ Configuration sans code
-- ✅ Ajout facile de nouveaux triggers/actions
-- ✅ Composition de workflows complexes
-- ✅ Testabilité et maintenabilité
+**Design advantages**:
+- ✅ Configuration without code
+- ✅ Easy addition of new triggers/actions
+- ✅ Composition of complex workflows
+- ✅ Testability and maintainability
 
-## 🔄 Design de l'Intégration (Data Flow)
+## 🔄 Integration Design (Data Flow)
 
-### Flux de Traitement d'un Message
+### Message Processing Flow
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │ 1. INGESTION                                                  │
 ├──────────────────────────────────────────────────────────────┤
-│ Message externe (WhatsApp/Telegram/Discord)                  │
+│ External message (WhatsApp/Telegram/Discord)                 │
 │         ↓                                                     │
 │ Messaging Bridge MCP                                          │
 │         ↓                                                     │
-│ Normalisation format uniforme                                │
+│ Normalization to uniform format                              │
 │ {                                                             │
 │   "platform": "whatsapp",                                     │
 │   "content": {...},                                           │
@@ -259,76 +259,76 @@ class WhatsAppAdapter(ServiceAdapter):
 └──────────────────────────────────────────────────────────────┘
                         ↓
 ┌──────────────────────────────────────────────────────────────┐
-│ 2. ENRICHISSEMENT                                             │
+│ 2. ENRICHMENT                                                 │
 ├──────────────────────────────────────────────────────────────┤
 │ Message Processor Agent                                       │
 │         ↓                                                     │
-│ • Transcription audio (si applicable)                         │
-│ • Traduction (si nécessaire)                                  │
-│ • Extraction documents joints                                 │
-│ • Détection de domaine                                        │
+│ • Audio transcription (if applicable)                         │
+│ • Translation (if necessary)                                  │
+│ • Extract attached documents                                  │
+│ • Domain detection                                            │
 │         ↓                                                     │
-│ Message enrichi avec contexte                                 │
+│ Enriched message with context                                 │
 └──────────────────────────────────────────────────────────────┘
                         ↓
 ┌──────────────────────────────────────────────────────────────┐
-│ 3. ANALYSE                                                    │
+│ 3. ANALYSIS                                                   │
 ├──────────────────────────────────────────────────────────────┤
 │ Data Sorter Agent                                             │
 │         ↓                                                     │
-│ Délégation aux analyseurs de domaine                          │
+│ Delegation to domain analyzers                                │
 │ ┌────────────┐  ┌────────────┐  ┌────────────┐             │
 │ │ Medical    │  │ Financial  │  │ Logistics  │             │
 │ │ Analyzer   │  │ Analyzer   │  │ Analyzer   │             │
 │ └────────────┘  └────────────┘  └────────────┘             │
 │         ↓                                                     │
-│ Résultats structurés + détection données manquantes          │
+│ Structured results + missing data detection                   │
 └──────────────────────────────────────────────────────────────┘
                         ↓
 ┌──────────────────────────────────────────────────────────────┐
-│ 4. PERSISTANCE                                                │
+│ 4. PERSISTENCE                                                │
 ├──────────────────────────────────────────────────────────────┤
 │ Database Manager Agent                                        │
 │         ↓                                                     │
-│ Routage vers DB appropriée                                    │
-│ • Cloudflare D1 pour données opérationnelles                  │
-│ • PostgreSQL pour analytics                                   │
-│ • Redis pour cache/sessions                                   │
+│ Routing to appropriate DB                                     │
+│ • Cloudflare D1 for operational data                          │
+│ • PostgreSQL for analytics                                    │
+│ • Redis for cache/sessions                                    │
 │         ↓                                                     │
-│ Stockage avec métadonnées qualité                            │
-│ • Score de complétude                                         │
-│ • Flags données manquantes                                    │
-│ • Timestamps et traçabilité                                   │
+│ Storage with quality metadata                                 │
+│ • Completeness score                                          │
+│ • Missing data flags                                          │
+│ • Timestamps and traceability                                 │
 └──────────────────────────────────────────────────────────────┘
                         ↓
 ┌──────────────────────────────────────────────────────────────┐
-│ 5. SUIVI (si données incomplètes)                             │
+│ 5. FOLLOW-UP (if incomplete data)                             │
 ├──────────────────────────────────────────────────────────────┤
 │ System Orchestrator                                           │
 │         ↓                                                     │
-│ Génération questions de suivi                                 │
+│ Generate follow-up questions                                  │
 │         ↓                                                     │
-│ Envoi via Messaging Bridge                                    │
+│ Send via Messaging Bridge                                     │
 │         ↓                                                     │
-│ Tracking timeout et réponses                                  │
+│ Track timeout and responses                                   │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ### Design Pattern: Pipeline Pattern
 
-Ce flux utilise le **Pipeline Pattern** avec les caractéristiques suivantes:
+This flow uses the **Pipeline Pattern** with the following characteristics:
 
-- **Stages séquentiels**: Chaque étape transforme les données
-- **Immutabilité**: Les données originales sont préservées
-- **Traçabilité**: Chaque stage ajoute des métadonnées
-- **Error Handling**: Chaque stage peut déclencher un fallback
-- **Async Processing**: Exécution non-bloquante
+- **Sequential stages**: Each step transforms the data
+- **Immutability**: Original data is preserved
+- **Traceability**: Each stage adds metadata
+- **Error Handling**: Each stage can trigger fallback
+- **Async Processing**: Non-blocking execution
 
-## 💾 Design de la Persistance
+## 💾 Persistence Design
 
-### Stratégie Multi-Database
+### Multi-Database Strategy
 
-**Principe**: Database per Domain Pattern
+**Principle**: Database per Domain Pattern
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -337,118 +337,118 @@ Ce flux utilise le **Pipeline Pattern** avec les caractéristiques suivantes:
 │                                                              │
 │  ┌──────────────────────────────────────────────┐          │
 │  │  Cloudflare D1 (Primary Operational Data)    │          │
-│  │  • Données opérationnelles temps réel        │          │
+│  │  • Real-time operational data                │          │
 │  │  • Fast writes, edge deployment              │          │
 │  │  • Auto-scaling                               │          │
 │  └──────────────────────────────────────────────┘          │
 │                                                              │
 │  ┌──────────────────────────────────────────────┐          │
 │  │  PostgreSQL (Analytics & Reporting)           │          │
-│  │  • Analyses complexes                         │          │
-│  │  • Agrégations lourdes                        │          │
+│  │  • Complex analysis                           │          │
+│  │  • Heavy aggregations                         │          │
 │  │  • Historical data                            │          │
 │  └──────────────────────────────────────────────┘          │
 │                                                              │
 │  ┌──────────────────────────────────────────────┐          │
 │  │  Redis/Upstash (Cache & Sessions)            │          │
-│  │  • Cache haute performance                    │          │
+│  │  • High-performance cache                     │          │
 │  │  • Session management                         │          │
 │  │  • Rate limiting                              │          │
 │  └──────────────────────────────────────────────┘          │
 │                                                              │
 │  ┌──────────────────────────────────────────────┐          │
 │  │  Vector Store (Semantic Search)               │          │
-│  │  • Embeddings de documents                    │          │
-│  │  • Recherche sémantique                       │          │
+│  │  • Document embeddings                        │          │
+│  │  • Semantic search                            │          │
 │  │  • RAG (Retrieval Augmented Generation)      │          │
 │  └──────────────────────────────────────────────┘          │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Avantages du design**:
-- ✅ Optimisation par use case (write-heavy vs read-heavy)
-- ✅ Scalabilité indépendante par domaine
-- ✅ Coût optimisé (edge vs cloud)
-- ✅ Résilience (failure isolation)
+**Design advantages**:
+- ✅ Optimization per use case (write-heavy vs read-heavy)
+- ✅ Independent scalability per domain
+- ✅ Optimized cost (edge vs cloud)
+- ✅ Resilience (failure isolation)
 
 ### Schema Design: Quality Tracking
 
-**Innovation**: Système de tracking qualité des données
+**Innovation**: Data quality tracking system
 
 ```sql
--- Table de tracking qualité (ajoutée à chaque DB)
+-- Quality tracking table (added to each DB)
 CREATE TABLE data_quality_tracking (
     id INTEGER PRIMARY KEY,
     entity_type TEXT NOT NULL,
     entity_id TEXT NOT NULL,
     completeness_score REAL DEFAULT 0.0,
-    missing_fields TEXT[], -- Array de champs manquants
-    quality_flags TEXT[],  -- Flags de qualité
+    missing_fields TEXT[], -- Array of missing fields
+    quality_flags TEXT[],  -- Quality flags
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     follow_up_count INTEGER DEFAULT 0,
     follow_up_deadline TIMESTAMP
 );
 
--- Index pour queries fréquentes
+-- Indexes for frequent queries
 CREATE INDEX idx_quality_score ON data_quality_tracking(completeness_score);
 CREATE INDEX idx_follow_up ON data_quality_tracking(follow_up_deadline)
     WHERE follow_up_deadline IS NOT NULL;
 ```
 
 **Pattern**: Metadata Enrichment Pattern
-- Permet analytics sur qualité des données
-- Facilite la priorisation des follow-ups
-- Support pour data governance
+- Enables analytics on data quality
+- Facilitates follow-up prioritization
+- Support for data governance
 
-## 🔐 Design de la Sécurité
+## 🔐 Security Design
 
-### Layers de Sécurité
+### Security Layers
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Layer 1: Authentication & Authorization                      │
-│ • API Keys centralisés (.env)                                │
-│ • Rotation automatique des tokens                            │
+│ • Centralized API Keys (.env)                                │
+│ • Automatic token rotation                                   │
 │ • Least privilege principle                                  │
 └────────────────────────┬────────────────────────────────────┘
                          │
 ┌────────────────────────▼────────────────────────────────────┐
 │ Layer 2: Transport Security                                  │
-│ • TLS/SSL pour toutes communications                         │
-│ • Certificate pinning pour APIs critiques                    │
-│ • VPN pour accès bases de données                            │
+│ • TLS/SSL for all communications                             │
+│ • Certificate pinning for critical APIs                      │
+│ • VPN for database access                                    │
 └────────────────────────┬────────────────────────────────────┘
                          │
 ┌────────────────────────▼────────────────────────────────────┐
 │ Layer 3: Data Security                                       │
 │ • Encryption at rest (databases)                             │
 │ • Encryption in transit                                      │
-│ • Data anonymization pour logs                               │
+│ • Data anonymization for logs                                │
 └────────────────────────┬────────────────────────────────────┘
                          │
 ┌────────────────────────▼────────────────────────────────────┐
 │ Layer 4: Audit & Compliance                                  │
-│ • Logging exhaustif des accès                                │
-│ • Audit trail immuable                                       │
+│ • Exhaustive access logging                                  │
+│ • Immutable audit trail                                      │
 │ • GDPR compliance (data retention, right to deletion)        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 **Pattern**: Defense in Depth
-- Multiples couches de protection
-- Failure d'une couche n'expose pas le système
-- Audit et détection d'intrusion
+- Multiple protection layers
+- Single layer failure doesn't expose the system
+- Audit and intrusion detection
 
-## ⚡ Design pour la Performance
+## ⚡ Performance Design
 
-### Stratégies d'Optimisation
+### Optimization Strategies
 
 #### 1. Connection Pooling
 
 ```python
 class ConnectionPool:
-    """Pool de connexions réutilisables"""
+    """Pool of reusable connections"""
 
     def __init__(self, max_size=10, timeout=30):
         self.max_size = max_size
@@ -462,7 +462,7 @@ class ConnectionPool:
                 self.pool.get(), timeout=self.timeout
             )
         except asyncio.TimeoutError:
-            # Fallback: créer nouvelle connexion temporaire
+            # Fallback: create temporary connection
             return await self.create_temp_connection()
 ```
 
@@ -475,85 +475,85 @@ class ConnectionPool:
 │                                                              │
 │  L1: In-Memory Cache (Agent Level)                          │
 │      • TTL: 1 minute                                         │
-│      • Use: Requêtes répétées dans même session             │
+│      • Use: Repeated queries in same session                │
 │                                                              │
 │  L2: Redis Cache (Shared)                                    │
 │      • TTL: 15 minutes                                       │
-│      • Use: Données fréquemment accédées                     │
+│      • Use: Frequently accessed data                         │
 │                                                              │
 │  L3: CDN/Edge Cache (Cloudflare)                            │
 │      • TTL: 1 hour                                           │
-│      • Use: Données publiques/statiques                      │
+│      • Use: Public/static data                               │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 **Pattern**: Multi-Level Caching
-- Optimise latence et coût
-- Invalidation en cascade
-- TTL adaptatif par type de données
+- Optimizes latency and cost
+- Cascading invalidation
+- Adaptive TTL per data type
 
 #### 3. Async Processing
 
 ```python
-# Pattern: Fan-out/Fan-in pour traitement parallèle
+# Pattern: Fan-out/Fan-in for parallel processing
 
 async def process_batch(messages: List[Message]) -> List[Result]:
-    """Traitement parallèle avec agrégation"""
+    """Parallel processing with aggregation"""
 
-    # Fan-out: lancer traitements en parallèle
+    # Fan-out: launch parallel processing
     tasks = [
         process_message(msg)
         for msg in messages
     ]
 
-    # Fan-in: attendre et agréger résultats
+    # Fan-in: wait and aggregate results
     results = await asyncio.gather(
         *tasks,
-        return_exceptions=True  # Isoler les erreurs
+        return_exceptions=True  # Isolate errors
     )
 
-    # Filtrer succès/échecs
+    # Filter success/failures
     successful = [r for r in results if not isinstance(r, Exception)]
     failed = [r for r in results if isinstance(r, Exception)]
 
-    # Retry logic pour échecs
+    # Retry logic for failures
     if failed:
         await schedule_retry(failed)
 
     return successful
 ```
 
-**Avantages**:
-- ✅ Throughput élevé
-- ✅ Utilisation optimale des ressources
-- ✅ Résilience aux erreurs partielles
+**Advantages**:
+- ✅ High throughput
+- ✅ Optimal resource utilization
+- ✅ Resilience to partial failures
 
-## 🧪 Design pour la Testabilité
+## 🧪 Design for Testability
 
 ### Test Pyramid
 
 ```
                     ┌─────────┐
-                    │   E2E   │  ← Peu de tests, coûteux
+                    │   E2E   │  ← Few tests, expensive
                     │  Tests  │
                   ┌─┴─────────┴─┐
-                  │ Integration │  ← Tests inter-composants
+                  │ Integration │  ← Inter-component tests
                   │    Tests    │
               ┌───┴─────────────┴───┐
-              │    Component Tests   │  ← Tests de composants isolés
+              │    Component Tests   │  ← Isolated component tests
           ┌───┴──────────────────────┴───┐
-          │        Unit Tests             │  ← Nombreux tests, rapides
+          │        Unit Tests             │  ← Many tests, fast
           └──────────────────────────────┘
 ```
 
-### Design Patterns pour Tests
+### Design Patterns for Tests
 
 #### Dependency Injection
 
 ```python
 class MessageProcessor:
-    """Testable grâce à DI"""
+    """Testable through DI"""
 
     def __init__(
         self,
@@ -566,10 +566,10 @@ class MessageProcessor:
         self.translator = translator
 
     async def process(self, message):
-        # Logic testable avec mocks
+        # Testable logic with mocks
         pass
 
-# Test avec mocks
+# Test with mocks
 async def test_message_processor():
     mock_mcp = MockMCPClient()
     mock_transcriber = MockTranscriber()
@@ -585,12 +585,12 @@ async def test_message_processor():
     assert result.status == "success"
 ```
 
-## 📊 Design pour l'Observabilité
+## 📊 Design for Observability
 
 ### Logging Strategy
 
 ```python
-# Structured Logging avec contexte
+# Structured Logging with context
 
 import structlog
 
@@ -617,19 +617,19 @@ async def process_message(message_id: str):
 ### Metrics & Monitoring
 
 ```
-Metrics clés à tracker:
+Key metrics to track:
 
 Performance:
-  • Latence P50, P95, P99 par endpoint
+  • Latency P50, P95, P99 per endpoint
   • Throughput (messages/sec)
   • Error rate
   • Connection pool utilization
 
 Business:
-  • Messages traités par plateforme
-  • Taux de complétude des données
-  • Taux de réponse aux follow-ups
-  • Distribution par domaine
+  • Messages processed per platform
+  • Data completeness rate
+  • Follow-up response rate
+  • Distribution by domain
 
 Resources:
   • CPU/Memory utilization
@@ -638,7 +638,7 @@ Resources:
   • Cache hit rate
 ```
 
-## 🔄 Design pour l'Évolutivité
+## 🔄 Design for Scalability
 
 ### Scalability Patterns
 
@@ -656,17 +656,17 @@ Resources:
 ```
 
 **Pattern**: Load Balancing + Stateless Services
-- Services stateless pour faciliter scaling
-- State externalisé (Redis/DB)
-- Health checks pour auto-healing
+- Stateless services for easy scaling
+- State externalized (Redis/DB)
+- Health checks for auto-healing
 
 #### Vertical Scaling
 
 ```python
-# Configuration adaptative des ressources
+# Adaptive resource configuration
 
 class AdaptiveResourceManager:
-    """Ajuste ressources selon charge"""
+    """Adjusts resources based on load"""
 
     async def monitor_and_adapt(self):
         metrics = await self.get_metrics()
@@ -684,69 +684,69 @@ class AdaptiveResourceManager:
 
 ## 🎯 Design Decisions & Trade-offs
 
-### Choix Architecturaux Majeurs
+### Major Architectural Choices
 
 #### 1. MCP vs REST API
 
-**Decision**: Utiliser MCP (Model Context Protocol)
+**Decision**: Use MCP (Model Context Protocol)
 
-**Raisons**:
-- ✅ Conçu spécifiquement pour AI agents
-- ✅ Gestion du contexte native
+**Reasons**:
+- ✅ Specifically designed for AI agents
+- ✅ Native context management
 - ✅ Streaming support
-- ✅ Standardisation émergente
+- ✅ Emerging standardization
 
 **Trade-offs**:
-- ⚠️ Écosystème moins mature que REST
-- ⚠️ Moins d'outils de debug
-- ⚠️ Courbe d'apprentissage
+- ⚠️ Less mature ecosystem than REST
+- ⚠️ Fewer debug tools
+- ⚠️ Learning curve
 
-#### 2. Python vs Node.js pour MCP Servers
+#### 2. Python vs Node.js for MCP Servers
 
-**Decision**: Python comme langage principal
+**Decision**: Python as primary language
 
-**Raisons**:
-- ✅ Écosystème ML/AI riche
-- ✅ Async/await natif (asyncio)
-- ✅ Data processing performant
-- ✅ Typage avec hints
+**Reasons**:
+- ✅ Rich ML/AI ecosystem
+- ✅ Native async/await (asyncio)
+- ✅ Performant data processing
+- ✅ Typing with hints
 
 **Trade-offs**:
-- ⚠️ Performance inférieure à Node pour I/O pur
-- ⚠️ GIL limitations pour multi-threading
-- ➡️ Mitigation: utilisation d'async pour I/O
+- ⚠️ Lower performance than Node for pure I/O
+- ⚠️ GIL limitations for multi-threading
+- ➡️ Mitigation: use async for I/O
 
 #### 3. Multi-Database vs Single Database
 
-**Decision**: Stratégie multi-database
+**Decision**: Multi-database strategy
 
-**Raisons**:
-- ✅ Optimisation par use case
-- ✅ Isolation des failures
-- ✅ Scalabilité indépendante
-- ✅ Coût optimisé
+**Reasons**:
+- ✅ Optimization per use case
+- ✅ Failure isolation
+- ✅ Independent scalability
+- ✅ Optimized cost
 
 **Trade-offs**:
-- ⚠️ Complexité opérationnelle
-- ⚠️ Pas de transactions distribuées
+- ⚠️ Operational complexity
+- ⚠️ No distributed transactions
 - ➡️ Mitigation: eventual consistency, saga pattern
 
 #### 4. Agent-Based vs Monolithic
 
-**Decision**: Architecture agent-based
+**Decision**: Agent-based architecture
 
-**Raisons**:
-- ✅ Séparation des préoccupations
-- ✅ Évolutivité indépendante
-- ✅ Testabilité
-- ✅ Alignement avec philosophie AI
+**Reasons**:
+- ✅ Separation of concerns
+- ✅ Independent scalability
+- ✅ Testability
+- ✅ Alignment with AI philosophy
 
 **Trade-offs**:
-- ⚠️ Overhead de communication inter-agent
-- ⚠️ Complexité de debugging
-- ➡️ Mitigation: observabilité renforcée
+- ⚠️ Inter-agent communication overhead
+- ⚠️ Debugging complexity
+- ➡️ Mitigation: enhanced observability
 
-## 🚀 Design pour le Déploiement
+## 🚀 Design for Deployment
 
 ### Deployment Strategy
 
@@ -793,59 +793,59 @@ class AdaptiveResourceManager:
 ```
 
 **Pattern**: Configuration Hierarchy Pattern
-- Defaults sensibles
-- Override progressif
-- Validation à chaque niveau
+- Sensible defaults
+- Progressive override
+- Validation at each level
 - Secrets via secrets manager
 
-## 📚 Références et Patterns Utilisés
+## 📚 References and Used Patterns
 
-### Design Patterns Implémentés
+### Implemented Design Patterns
 
 1. **Creational Patterns**
-   - Factory: Création de MCP clients
-   - Builder: Construction de requêtes complexes
-   - Singleton: Managers partagés
+   - Factory: MCP client creation
+   - Builder: Complex query construction
+   - Singleton: Shared managers
 
 2. **Structural Patterns**
-   - Adapter: Normalisation APIs externes
-   - Facade: Simplification MCP servers
+   - Adapter: External API normalization
+   - Facade: MCP server simplification
    - Proxy: Connection pooling
 
 3. **Behavioral Patterns**
-   - Observer: Monitoring système
-   - Strategy: Actions configurables
-   - Chain of Responsibility: Pipeline de traitement
+   - Observer: System monitoring
+   - Strategy: Configurable actions
+   - Chain of Responsibility: Processing pipeline
 
 4. **Architectural Patterns**
-   - Microservices: Services indépendants
-   - Event-Driven: Communication asynchrone
-   - CQRS: Séparation lecture/écriture
-   - Saga: Transactions distribuées
+   - Microservices: Independent services
+   - Event-Driven: Asynchronous communication
+   - CQRS: Read/write separation
+   - Saga: Distributed transactions
 
-### Principes SOLID
+### SOLID Principles
 
-- **S**ingle Responsibility: Un composant = une responsabilité
-- **O**pen/Closed: Extensions sans modification
-- **L**iskov Substitution: Interfaces substituables
-- **I**nterface Segregation: Interfaces spécifiques
-- **D**ependency Inversion: Dépendre d'abstractions
+- **S**ingle Responsibility: One component = one responsibility
+- **O**pen/Closed: Extensions without modification
+- **L**iskov Substitution: Substitutable interfaces
+- **I**nterface Segregation: Specific interfaces
+- **D**ependency Inversion: Depend on abstractions
 
 ## 🎓 Conclusion
 
-Ce design architectural favorise:
+This architectural design promotes:
 
-✅ **Modularité**: Composants indépendants et réutilisables
-✅ **Scalabilité**: Horizontal et vertical scaling
-✅ **Maintenabilité**: Code clair et testable
-✅ **Extensibilité**: Ajout facile de fonctionnalités
-✅ **Résilience**: Gestion d'erreurs et fallbacks
-✅ **Performance**: Optimisations multi-niveaux
-✅ **Sécurité**: Defense in depth
-✅ **Observabilité**: Logging et metrics complets
+✅ **Modularity**: Independent and reusable components
+✅ **Scalability**: Horizontal and vertical scaling
+✅ **Maintainability**: Clear and testable code
+✅ **Extensibility**: Easy addition of features
+✅ **Resilience**: Error handling and fallbacks
+✅ **Performance**: Multi-level optimizations
+✅ **Security**: Defense in depth
+✅ **Observability**: Complete logging and metrics
 
 ---
 
-**Auteur**: Build Tools Team
-**Dernière mise à jour**: 2025-11-04
+**Author**: Build Tools Team
+**Last Updated**: 2025-11-04
 **Version**: 1.0
