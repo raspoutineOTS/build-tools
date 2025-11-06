@@ -46,6 +46,72 @@ claude mcp add messaging-bridge ./mcp-servers/messaging-bridge/server.py
 claude mcp add database-connector ./mcp-servers/database-connector/connector.py
 ```
 
+## 📐 Architecture & Design Philosophy
+
+Build Tools adopts a **modular and extensible architecture** designed to simplify automation and AI integration.
+
+### 🎯 Design Principles
+
+1. **Modularity**: Independent and reusable components
+2. **Extensibility**: Plugin architecture for new components
+3. **Interoperability**: MCP standard for uniform communication
+4. **Security by Design**: Passwordless approach via messaging platforms
+
+### 🔐 Security Innovation: Passwordless Authentication
+
+**Problem Solved**: Elimination of complex login/password management for field actors.
+
+**Solution**: Using WhatsApp, Telegram and other messaging platforms as authentication channel.
+
+**Benefits**:
+- ✅ **Zero Password Management**: No credentials to manage
+- ✅ **Native 2FA**: Strong authentication via platforms
+- ✅ **Zero Training**: Interface already familiar to users
+- ✅ **Instant Access**: No account creation needed
+- ✅ **Complete Audit**: Traceability by phone number
+- ✅ **Reduced Costs**: Less infrastructure and support
+
+```
+Simplified Flow:
+User → WhatsApp/Telegram (already authenticated)
+     → Message to bot
+     → Whitelist validation
+     → Secure processing
+```
+
+**📖 Details**: See [Passwordless Security Design](docs/passwordless-security-design.md)
+
+### 🏗️ Layered Architecture
+
+```
+┌─────────────────────────────────────────┐
+│   CLAUDE CODE (Natural Language)        │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│   AGENT LAYER (Intelligence)            │
+│   • Orchestrator • Processor • Sorter   │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│   MCP SERVER LAYER (Integration)        │
+│   • Messaging • Database • Context      │
+└──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│   EXTERNAL SERVICES                      │
+│   • WhatsApp • D1 • Redis • etc.        │
+└─────────────────────────────────────────┘
+```
+
+### 📚 Complete Documentation
+
+- **[Architecture & Design](docs/architecture-design.md)**: Patterns, architectural choices, data flow
+- **[Build Design](docs/build-design.md)**: Build process, CI/CD, deployment
+- **[Passwordless Security](docs/passwordless-security-design.md)**: Messaging-based security, access management
+- **[Setup Guide](docs/setup-guide.md)**: Detailed installation and configuration
+- **[Enhanced Agent System](docs/enhanced-agent-system.md)**: Advanced multi-agent system
+
 ## 📁 Project Structure
 
 ```
@@ -69,9 +135,12 @@ build-tools/
 │   ├── claude-settings/          # Claude Code settings
 │   └── mcp-templates/            # MCP server configs
 └── docs/                         # 📚 Documentation
-    ├── setup-guide.md
-    ├── architecture.md
     ├── ARCHITECTURE_V3.md           # 🆕 v3.0 Architecture guide
+    ├── architecture-design.md    # Complete architecture
+    ├── build-design.md           # Build process
+    ├── passwordless-security-design.md  # Passwordless security
+    ├── setup-guide.md            # Installation guide
+    ├── enhanced-agent-system.md  # Multi-agent system
     └── examples/
 ```
 
@@ -419,6 +488,53 @@ Universal daemon and service management system.
 - Health monitoring and auto-restart
 - Log management and rotation
 - Configuration-driven setup
+
+## 🔨 Build & Deployment Design
+
+### Build System Philosophy
+
+The build system prioritizes **simplicity, reproducibility and speed**:
+
+**Key Features**:
+- ✅ **One-Command Install**: Complete installation in one command
+- ✅ **Multi-Language Support**: Python, Node.js, Bash harmonized
+- ✅ **Incremental Builds**: Rebuild only modified components
+- ✅ **Multi-Level Caching**: Build time optimization
+- ✅ **Integrated CI/CD**: Automatic deployment to staging/production
+- ✅ **Security Scanning**: Automatic vulnerability analysis
+
+### Build Pipeline
+
+```bash
+# Complete build
+./scripts/build.sh
+
+# Steps:
+# 1. Environment validation
+# 2. Dependencies installation (Python + Node.js)
+# 3. Configuration setup
+# 4. Automated tests
+# 5. Build artifacts
+# 6. Post-build validation
+```
+
+### Deployment Strategies
+
+The system supports multiple strategies:
+
+1. **Blue-Green**: Zero-downtime deployment with instant fallback
+2. **Canary**: Progressive rollout with monitoring (5% → 100%)
+3. **Rolling**: Instance-by-instance update
+
+```bash
+# Staging deployment
+./scripts/deploy.sh staging rolling
+
+# Production deployment with blue-green
+./scripts/deploy.sh production blue-green
+```
+
+**📖 Complete documentation**: [Build Design](docs/build-design.md)
 
 ## 🔧 Configuration
 
