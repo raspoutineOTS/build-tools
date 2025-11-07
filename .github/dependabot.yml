@@ -1,0 +1,132 @@
+# Dependabot Configuration
+# Automated dependency updates for security and maintenance
+# Documentation: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # ========================================
+  # Python Dependencies (OCR Watcher)
+  # ========================================
+  - package-ecosystem: "pip"
+    directory: "/automation/ocr-watcher"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Toronto"
+
+    # Limit open pull requests to avoid spam
+    open-pull-requests-limit: 5
+
+    # Labels for easy filtering
+    labels:
+      - "dependencies"
+      - "python"
+      - "security"
+
+    # Automatically rebase when conflicts occur
+    rebase-strategy: "auto"
+
+    # Group minor and patch updates together
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+    # Version update strategy
+    versioning-strategy: "increase"
+
+    # Commit message prefix
+    commit-message:
+      prefix: "deps(python)"
+      include: "scope"
+
+  # ========================================
+  # GitHub Actions
+  # ========================================
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Toronto"
+
+    open-pull-requests-limit: 5
+
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "ci"
+
+    rebase-strategy: "auto"
+
+    # Group all action updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+    commit-message:
+      prefix: "ci(actions)"
+      include: "scope"
+
+  # ========================================
+  # Git Submodules (DeepSeek-OCR)
+  # ========================================
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Toronto"
+
+    open-pull-requests-limit: 2
+
+    labels:
+      - "dependencies"
+      - "submodule"
+      - "ocr"
+
+    rebase-strategy: "auto"
+
+    commit-message:
+      prefix: "deps(submodule)"
+      include: "scope"
+
+# ========================================
+# NOTES
+# ========================================
+#
+# Dependabot will:
+# 1. Monitor dependencies weekly (every Monday at 9am)
+# 2. Create PRs for security updates immediately
+# 3. Group minor/patch updates to reduce PR noise
+# 4. Apply labels for easy filtering
+# 5. Automatically rebase when conflicts occur
+#
+# How to test locally:
+# - Python: pip-audit -r automation/ocr-watcher/requirements.txt
+# - Actions: Check https://github.com/actions/<action>/releases
+# - Submodules: cd automation/ocr-watcher/deepseek-ocr && git fetch
+#
+# Security alerts:
+# - Critical/High: PRs created immediately
+# - Medium/Low: Grouped with weekly updates
+#
+# Reviewing Dependabot PRs:
+# 1. Check changelog/release notes
+# 2. Verify CI passes
+# 3. Test locally if breaking changes
+# 4. Merge or dismiss with reason
+#
+# Future additions (when applicable):
+# - "npm" for Node.js dependencies
+# - "cargo" for Rust dependencies (if deepseek-ocr Cargo.toml in root)
+# - "docker" for Docker images
+# - "gomod" for Go modules
+#

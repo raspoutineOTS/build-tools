@@ -1,0 +1,152 @@
+# Code Owners for build-tools
+#
+# This file defines individuals or teams responsible for code in this repository.
+# Code owners are automatically requested for review when someone opens a pull
+# request that modifies code they own.
+#
+# Documentation: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in the repo
+# This will be requested for review on all PRs unless a later match takes precedence
+* @raspoutineOTS
+
+# ========================================
+# AGENTS - Claude Code Agents
+# ========================================
+
+/agents/ @raspoutineOTS
+
+# Domain-specific agents
+/agents/system-orchestrator/ @raspoutineOTS
+/agents/message-processor/ @raspoutineOTS
+/agents/data-sorter/ @raspoutineOTS
+/agents/database-manager/ @raspoutineOTS
+
+# Generic template for creating custom analyzers
+/agents/domain-analyzer-template/ @raspoutineOTS
+
+# ========================================
+# MCP SERVERS - Model Context Protocol
+# ========================================
+
+/mcp-servers/ @raspoutineOTS
+/mcp-servers/messaging-bridge/ @raspoutineOTS
+/mcp-servers/database-connector/ @raspoutineOTS
+/mcp-servers/context-wrapper/ @raspoutineOTS
+
+# ========================================
+# AUTOMATION - Critical Scripts
+# ========================================
+
+/automation/ @raspoutineOTS
+
+# OCR Watcher (high complexity)
+/automation/ocr-watcher/ @raspoutineOTS
+
+# Media processors (security-sensitive due to external APIs)
+/automation/media-processors/ @raspoutineOTS
+
+# Database tools (Cloudflare D1 access)
+/automation/database-tools/ @raspoutineOTS
+
+# Monitor hooks (system-level operations)
+/automation/monitor-hooks/ @raspoutineOTS
+
+# Service manager (daemon management)
+/automation/service-manager/ @raspoutineOTS
+
+# Document processor
+/automation/document-processor/ @raspoutineOTS
+
+# ========================================
+# CONFIGURATIONS - Sensitive
+# ========================================
+
+/configs/ @raspoutineOTS
+/configs/mcp-templates/ @raspoutineOTS
+/configs/claude-settings/ @raspoutineOTS
+
+# ========================================
+# CI/CD - Build & Deployment
+# ========================================
+
+/.github/ @raspoutineOTS
+/.github/workflows/ @raspoutineOTS
+
+# Require review for CI/CD changes (critical for security)
+/.github/workflows/*.yml @raspoutineOTS
+/.github/workflows/*.yaml @raspoutineOTS
+
+# ========================================
+# DOCUMENTATION
+# ========================================
+
+/docs/ @raspoutineOTS
+
+# Core architecture documents (require careful review)
+/docs/ARCHITECTURE*.md @raspoutineOTS
+/docs/REPO_GOVERNANCE.md @raspoutineOTS
+
+# Guides can have broader review
+/docs/guides/ @raspoutineOTS
+/docs/setup-guide.md @raspoutineOTS
+
+# ========================================
+# ROOT-LEVEL FILES
+# ========================================
+
+# Security policy (critical)
+/SECURITY.md @raspoutineOTS
+
+# Contribution guidelines
+/CONTRIBUTING.md @raspoutineOTS
+
+# Project overview
+/README.md @raspoutineOTS
+
+# License (legal implications)
+/LICENSE @raspoutineOTS
+
+# Changelog (release management)
+/CHANGELOG.md @raspoutineOTS
+
+# Git configuration
+/.gitignore @raspoutineOTS
+/.gitattributes @raspoutineOTS
+
+# Dependency management
+/requirements.txt @raspoutineOTS
+/package.json @raspoutineOTS
+
+# ========================================
+# SPECIAL CASES
+# ========================================
+
+# All Markdown files (documentation)
+*.md @raspoutineOTS
+
+# Configuration files (security implications)
+*.json @raspoutineOTS
+*.yml @raspoutineOTS
+*.yaml @raspoutineOTS
+
+# Shell scripts (potential security risks)
+*.sh @raspoutineOTS
+
+# Python scripts
+*.py @raspoutineOTS
+
+# ========================================
+# NOTES
+# ========================================
+#
+# When adding new team members:
+# 1. Replace @raspoutineOTS with @org/team-name for specific areas
+# 2. Add individuals for specialized components
+# 3. Consider creating teams: @org/agents-team, @org/mcp-team, etc.
+#
+# Examples for multi-owner scenarios:
+# /agents/ @raspoutineOTS @contributor2
+# /mcp-servers/ @org/mcp-team
+# *.py @org/python-reviewers
+#
