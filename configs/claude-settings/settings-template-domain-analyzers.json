@@ -1,0 +1,115 @@
+{
+  "agents": [
+    {
+      "name": "system-orchestrator",
+      "description": "Coordinate multi-agent workflows and route tasks to domain analyzers. Examples: \"Delegate domain analysis and consolidate results\"",
+      "model": "sonnet",
+      "color": "green"
+    },
+    {
+      "name": "message-processor",
+      "description": "Retrieve and normalize messages and documents. Examples: \"Extract recent messages\", \"Process PDFs\"",
+      "model": "sonnet",
+      "color": "blue"
+    },
+    {
+      "name": "data-sorter",
+      "description": "Detect domains and route payloads to analyzers. Examples: \"Categorize content by domain\"",
+      "model": "sonnet",
+      "color": "yellow"
+    },
+    {
+      "name": "domain-analyzer-1",
+      "description": "Domain analyzer (Haiku). Create from agents/domain-analyzer-template/agent-template.md and customize for your primary domain.",
+      "model": "haiku",
+      "color": "cyan"
+    },
+    {
+      "name": "domain-analyzer-2",
+      "description": "Domain analyzer (Haiku). Create from agents/domain-analyzer-template/agent-template.md and customize for your administrative domain.",
+      "model": "haiku",
+      "color": "cyan"
+    },
+    {
+      "name": "domain-analyzer-3",
+      "description": "Domain analyzer (Haiku). Create from agents/domain-analyzer-template/agent-template.md and customize for your distribution domain.",
+      "model": "haiku",
+      "color": "cyan"
+    },
+    {
+      "name": "domain-analyzer-4",
+      "description": "Domain analyzer (Haiku). Create from agents/domain-analyzer-template/agent-template.md and customize for your logistics domain.",
+      "model": "haiku",
+      "color": "cyan"
+    },
+    {
+      "name": "database-manager",
+      "description": "Store and query structured data across domain databases. Examples: \"Insert analyzed data\", \"Run schema migrations\"",
+      "model": "sonnet",
+      "color": "purple"
+    }
+  ],
+  "hooks": {
+    "SessionStart": [
+      "./automation/monitor-hooks/smart-monitor.sh"
+    ],
+    "UserPromptSubmit": [
+      "./automation/monitor-hooks/smart-monitor.sh"
+    ]
+  },
+  "preferences": {
+    "verbosity": "normal",
+    "auto_save": true,
+    "theme": "auto",
+    "confirm_destructive_actions": true
+  },
+  "mcp_servers": {
+    "messaging-bridge": {
+      "command": "python3",
+      "args": ["./mcp-servers/messaging-bridge/server.py"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "database-connector": {
+      "command": "python3",
+      "args": ["./mcp-servers/database-connector/connector.py"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "context-wrapper": {
+      "command": "./mcp-servers/context-wrapper/wrapper.sh",
+      "args": [],
+      "env": {
+        "UPSTASH_REDIS_REST_URL": "${UPSTASH_REDIS_REST_URL}",
+        "UPSTASH_REDIS_REST_TOKEN": "${UPSTASH_REDIS_REST_TOKEN}",
+        "UPSTASH_VECTOR_REST_URL": "${UPSTASH_VECTOR_REST_URL}",
+        "UPSTASH_VECTOR_REST_TOKEN": "${UPSTASH_VECTOR_REST_TOKEN}",
+        "UPSTASH_REDIS_URL": "${UPSTASH_REDIS_URL}",
+        "UPSTASH_REDIS_TOKEN": "${UPSTASH_REDIS_TOKEN}",
+        "UPSTASH_VECTOR_URL": "${UPSTASH_VECTOR_URL}",
+        "UPSTASH_VECTOR_TOKEN": "${UPSTASH_VECTOR_TOKEN}"
+      }
+    }
+  },
+  "workflows": {
+    "multi_domain_analysis": {
+      "description": "Route data to domain analyzers and store results",
+      "steps": [
+        {
+          "agent": "message-processor",
+          "task": "Extract messages and documents"
+        },
+        {
+          "agent": "data-sorter",
+          "task": "Detect domains and route payloads"
+        },
+        {
+          "agent": "database-manager",
+          "task": "Store aggregated domain results"
+        }
+      ]
+    }
+  }
+}

@@ -1,7 +1,7 @@
 # 🏗️ Build-Tools Architecture v3.0
 
 **Version**: 3.0
-**Last Updated**: January 2025
+**Last Updated**: January 2026
 **Status**: Production-Ready
 
 ---
@@ -182,7 +182,7 @@ Always return a structured summary of actions taken.
 ```json
 {
   "source": "whatsapp",
-  "timestamp": "2025-01-15T10:30:00Z",
+  "timestamp": "2026-01-15T10:30:00Z",
   "sender": "user_id_123",
   "content_type": "text",
   "extracted_text": "Message content here",
@@ -332,7 +332,7 @@ You receive extracted data that has been classified as [DOMAIN_NAME].
 ```markdown
 For audio transcription:
 1. Download audio file
-2. Call ElevenLabs MCP: transcribe(file_path, language="auto")
+2. Call ElevenLabs MCP: speech_to_text(file_path, language_code="auto", model_id="scribe_v1", enable_logging=true)
 3. Receive transcript with confidence score
 4. Store in audio_transcriptions table
 ```
@@ -361,7 +361,7 @@ database_manager.insert(
     data={
         "user_id": 123,
         "event_type": "message_sent",
-        "timestamp": "2025-01-15T10:30:00Z"
+        "timestamp": "2026-01-15T10:30:00Z"
     }
 )
 ```
@@ -626,5 +626,5 @@ results = database_manager.query(
 
 **Document Version**: 1.0
 **Architecture Version**: 3.0
-**Last Updated**: January 2025
+**Last Updated**: January 2026
 **Status**: Production-Ready

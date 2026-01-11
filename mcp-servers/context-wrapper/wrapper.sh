@@ -61,10 +61,10 @@ load_config() {
     "NODE_ENV": "production"
   },
   "upstash": {
-    "redis_url": "\${UPSTASH_REDIS_URL}",
-    "redis_token": "\${UPSTASH_REDIS_TOKEN}",
-    "vector_url": "\${UPSTASH_VECTOR_URL}",
-    "vector_token": "\${UPSTASH_VECTOR_TOKEN}"
+    "redis_url": "\${UPSTASH_REDIS_REST_URL}",
+    "redis_token": "\${UPSTASH_REDIS_REST_TOKEN}",
+    "vector_url": "\${UPSTASH_VECTOR_REST_URL}",
+    "vector_token": "\${UPSTASH_VECTOR_REST_TOKEN}"
   }
 }
 EOF
@@ -159,7 +159,33 @@ install_context7() {
 # Validate environment
 validate_environment() {
     log "Validating environment"
-    
+
+    # Map REST env vars to legacy names and vice versa for compatibility
+    if [[ -z "${UPSTASH_REDIS_URL:-}" && -n "${UPSTASH_REDIS_REST_URL:-}" ]]; then
+        export UPSTASH_REDIS_URL="$UPSTASH_REDIS_REST_URL"
+    fi
+    if [[ -z "${UPSTASH_REDIS_REST_URL:-}" && -n "${UPSTASH_REDIS_URL:-}" ]]; then
+        export UPSTASH_REDIS_REST_URL="$UPSTASH_REDIS_URL"
+    fi
+    if [[ -z "${UPSTASH_REDIS_TOKEN:-}" && -n "${UPSTASH_REDIS_REST_TOKEN:-}" ]]; then
+        export UPSTASH_REDIS_TOKEN="$UPSTASH_REDIS_REST_TOKEN"
+    fi
+    if [[ -z "${UPSTASH_REDIS_REST_TOKEN:-}" && -n "${UPSTASH_REDIS_TOKEN:-}" ]]; then
+        export UPSTASH_REDIS_REST_TOKEN="$UPSTASH_REDIS_TOKEN"
+    fi
+    if [[ -z "${UPSTASH_VECTOR_URL:-}" && -n "${UPSTASH_VECTOR_REST_URL:-}" ]]; then
+        export UPSTASH_VECTOR_URL="$UPSTASH_VECTOR_REST_URL"
+    fi
+    if [[ -z "${UPSTASH_VECTOR_REST_URL:-}" && -n "${UPSTASH_VECTOR_URL:-}" ]]; then
+        export UPSTASH_VECTOR_REST_URL="$UPSTASH_VECTOR_URL"
+    fi
+    if [[ -z "${UPSTASH_VECTOR_TOKEN:-}" && -n "${UPSTASH_VECTOR_REST_TOKEN:-}" ]]; then
+        export UPSTASH_VECTOR_TOKEN="$UPSTASH_VECTOR_REST_TOKEN"
+    fi
+    if [[ -z "${UPSTASH_VECTOR_REST_TOKEN:-}" && -n "${UPSTASH_VECTOR_TOKEN:-}" ]]; then
+        export UPSTASH_VECTOR_REST_TOKEN="$UPSTASH_VECTOR_TOKEN"
+    fi
+
     # Check required environment variables for Upstash
     local required_vars=()
     
@@ -289,10 +315,14 @@ OPTIONS:
 ENVIRONMENT VARIABLES:
   CONFIG_FILE         Path to configuration file
   LOG_FILE           Path to log file
-  UPSTASH_REDIS_URL  Upstash Redis connection URL
-  UPSTASH_REDIS_TOKEN Upstash Redis authentication token
-  UPSTASH_VECTOR_URL  Upstash Vector database URL  
-  UPSTASH_VECTOR_TOKEN Upstash Vector authentication token
+  UPSTASH_REDIS_REST_URL   Upstash Redis REST URL
+  UPSTASH_REDIS_REST_TOKEN Upstash Redis REST token
+  UPSTASH_VECTOR_REST_URL  Upstash Vector REST URL
+  UPSTASH_VECTOR_REST_TOKEN Upstash Vector REST token
+  UPSTASH_REDIS_URL        Legacy alias for Redis REST URL
+  UPSTASH_REDIS_TOKEN      Legacy alias for Redis REST token
+  UPSTASH_VECTOR_URL       Legacy alias for Vector REST URL
+  UPSTASH_VECTOR_TOKEN     Legacy alias for Vector REST token
 
 EXAMPLES:
   $0                          # Start with default configuration

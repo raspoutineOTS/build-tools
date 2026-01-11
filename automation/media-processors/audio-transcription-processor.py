@@ -14,6 +14,10 @@ from datetime import datetime
 # Configuration from environment variables
 ELEVENLABS_API_KEY = os.getenv('ELEVENLABS_API_KEY')
 ELEVENLABS_API_URL = "https://api.elevenlabs.io/v1/speech-to-text"
+ELEVENLABS_STT_MODEL_ID = os.getenv("ELEVENLABS_STT_MODEL_ID", "scribe_v1")
+ELEVENLABS_ENABLE_LOGGING = os.getenv("ELEVENLABS_ENABLE_LOGGING", "true").lower() in ("1", "true", "yes")
+ELEVENLABS_DIARIZE = os.getenv("ELEVENLABS_DIARIZE", "").lower() in ("1", "true", "yes")
+ELEVENLABS_TAG_AUDIO_EVENTS = os.getenv("ELEVENLABS_TAG_AUDIO_EVENTS", "").lower() in ("1", "true", "yes")
 STORE_PATH = Path(os.getenv('WHATSAPP_STORE_PATH', Path.home() / "whatsapp-store"))
 TRANSCRIPTIONS_PATH = Path(os.getenv('TRANSCRIPTIONS_PATH', Path.home() / "audio-transcriptions"))
 
@@ -57,34 +61,41 @@ def transcribe_audio_elevenlabs(audio_file_path, language_code=None):
     }
 
     # Prepare request data
-    files = {
-        'audio': open(audio_file_path, 'rb')
+    data = {
+        "model_id": ELEVENLABS_STT_MODEL_ID,
+        "enable_logging": str(ELEVENLABS_ENABLE_LOGGING).lower()
     }
-
-    data = {}
     if language_code:
-        data['model_id'] = 'eleven_multilingual_v2'
-        data['language_code'] = language_code
+        data["language_code"] = language_code
+    if ELEVENLABS_DIARIZE:
+        data["diarize"] = "true"
+    if ELEVENLABS_TAG_AUDIO_EVENTS:
+        data["tag_audio_events"] = "true"
 
     try:
-        response = requests.post(
-            ELEVENLABS_API_URL,
-            headers=headers,
-            files=files,
-            data=data if data else None,
-            timeout=60
-        )
+        with open(audio_file_path, "rb") as audio_file:
+            response = requests.post(
+                ELEVENLABS_API_URL,
+                headers=headers,
+                files={"audio": audio_file},
+                data=data,
+                timeout=60
+            )
 
         if response.status_code == 200:
             result = response.json()
-            transcription = result.get('text', '')
+            transcription = result.get("text") or result.get("transcription") or ""
+            transcription_id = result.get("transcription_id")
             detected_language = result.get('detected_language', language_code or 'unknown')
 
             print(f"✓ Transcription successful ({detected_language})")
+            if transcription_id and not transcription:
+                print(f"ℹ Transcription queued, id: {transcription_id}")
 
             return {
                 'success': True,
                 'transcription': transcription,
+                'transcription_id': transcription_id,
                 'detected_language': detected_language,
                 'confidence': result.get('confidence', 0.0),
                 'audio_duration': result.get('duration', 0)

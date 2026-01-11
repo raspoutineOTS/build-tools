@@ -69,6 +69,10 @@ export CLOUDFLARE_API_TOKEN="your_api_token_here"
 export CLOUDFLARE_ACCOUNT_ID="your_account_id_here"
 ```
 
+Note: For HTTP API writes, Cloudflare now requires API tokens with explicit
+`D1:Edit` permission. Invalid SQL returns HTTP 400 and overloaded databases
+can return HTTP 429.
+
 ### Helper Scripts Included
 
 #### 🔧 `wrangler-d1.sh`
@@ -203,7 +207,7 @@ client.select("app_core", "users")   # Full name
 ### Never Hardcode Credentials
 ```bash
 # ❌ WRONG
-export CLOUDFLARE_API_TOKEN="sk_123456..."
+export CLOUDFLARE_API_TOKEN="your_token_here"
 
 # ✅ CORRECT - Load from secure file
 source ~/.cloudflare/credentials.env

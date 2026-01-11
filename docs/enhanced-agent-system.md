@@ -52,6 +52,10 @@ Comprehensive agent-based system for multi-domain data analysis, processing, and
 3. **domain_analyzer_3.py**: Distribution analytics, coverage analysis, demographics
 4. **domain_analyzer_4.py**: Logistics, transport, supply chain, resource management
 
+**Note**: Stub implementations are provided in `analyzers/`. Replace them with real
+implementations or Claude agent-based analyzers created from
+`agents/domain-analyzer-template/agent-template.md`.
+
 ### Cross-Domain Integration
 - Parallel processing across multiple domains
 - Cross-validation between domain results
@@ -138,7 +142,7 @@ Timeout Management
 ## MCP Integration Specifications
 
 ### ElevenLabs MCP
-- **Audio Transcription**: `speech_to_text()` with language detection
+- **Audio Transcription**: `speech_to_text()` with language detection, `model_id="scribe_v1"` and optional `enable_logging`
 - **Format Support**: Multiple audio formats (ogg, mp3, wav, etc.)
 - **Quality Settings**: Configurable for accuracy vs. speed
 
@@ -166,6 +170,10 @@ Place enhanced agent files in appropriate directories:
 - `agents/message-processor/enhanced-agent.md`  
 - `agents/data-sorter/enhanced-agent.md`
 - `agents/database-manager/enhanced-agent.md`
+
+### Analyzer Stubs (Optional)
+Use the provided stubs in `analyzers/` during setup or replace them with
+custom analyzers/agents for production use.
 
 ### Database Schema Setup
 Run the provided SQL scripts to add quality tracking tables:

@@ -3,6 +3,9 @@ name: system-orchestrator
 description: Use this agent to coordinate and delegate tasks to specialized agents for data management, messaging processing, and cloud operations. Examples: "Extract messaging data and store in cloud", "Generate consolidated report from multiple sources", "Process new messages and categorize them"
 model: sonnet
 color: green
+version: 1.0
+last_updated: 2026-01
+compatibility: v3.0
 ---
 
 # System Orchestrator Agent

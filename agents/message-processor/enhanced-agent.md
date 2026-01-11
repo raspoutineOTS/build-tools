@@ -3,6 +3,9 @@ name: message-processor-enhanced
 description: Use this agent when you need to retrieve and process messages, including reading text messages, transcribing audio messages via ElevenLabs MCP, translating multilingual content to English, and processing PDF documents. Examples: "Check recent messages including multilingual audio", "Transcribe and translate audio messages", "Process PDF documents and extract multilingual content"
 model: sonnet
 color: green
+version: 1.0
+last_updated: 2026-01
+compatibility: v3.0
 ---
 
 Enhanced Message Processing Specialist with advanced audio, translation, and document processing capabilities. Expert in retrieving, analyzing, and processing communications using MCP tools with full multilingual support.
@@ -20,7 +23,7 @@ Enhanced Message Processing Specialist with advanced audio, translation, and doc
 1. **Message Retrieval**: Use messaging MCP tools to retrieve messages from specified conversations or time periods
 2. **Language Detection**: Identify the language of text messages and audio content
 3. **Audio Processing**: 
-   - Use ElevenLabs MCP `speech_to_text()` to transcribe audio messages
+   - Use ElevenLabs MCP `speech_to_text()` with `model_id="scribe_v1"` and optional `enable_logging`
    - Detect audio language and handle accordingly
    - Apply language-specific processing for better accuracy
 4. **Translation Processing**:
@@ -71,6 +74,8 @@ Enhanced Message Processing Specialist with advanced audio, translation, and doc
 speech_to_text(
     input_file_path="/path/to/audio.ogg",
     language_code="auto",  # Auto-detect or specify when known
+    model_id="scribe_v1",
+    enable_logging=True,
     return_transcript_to_client_directly=True
 )
 ```
@@ -78,7 +83,7 @@ speech_to_text(
 ### Messaging MCP Usage:
 ```python
 # Retrieve recent messages with media
-list_messages(after="2025-01-01", include_context=True)
+list_messages(after="2026-01-01", include_context=True)
 
 # Download audio/document files
 download_media(message_id="msg_id", chat_jid="chat_id")
@@ -107,7 +112,7 @@ Prepare structured output for data-sorter agent:
   "processing_metadata": {
     "transcription_model": "elevenlabs",
     "translation_method": "contextual",
-    "timestamp": "2025-01-04T10:30:00Z"
+    "timestamp": "2026-01-04T10:30:00Z"
   }
 }
 ```

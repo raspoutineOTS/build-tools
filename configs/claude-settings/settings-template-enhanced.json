@@ -1,0 +1,91 @@
+{
+  "agents": [
+    {
+      "name": "system-orchestrator-enhanced",
+      "description": "Enhanced coordinator for multi-agent workflows with audio transcription, multilingual translation, and follow-up collection. Examples: \"Process multilingual audio and route results\", \"Coordinate follow-up questions for missing fields\"",
+      "model": "sonnet",
+      "color": "blue"
+    },
+    {
+      "name": "message-processor-enhanced",
+      "description": "Enhanced message processing with audio transcription and multilingual translation. Examples: \"Transcribe audio messages\", \"Translate multilingual content and extract structure\"",
+      "model": "sonnet",
+      "color": "green"
+    },
+    {
+      "name": "data-sorter-enhanced",
+      "description": "Enhanced analysis and routing with missing-data detection and follow-up workflows. Examples: \"Analyze mixed data and identify gaps\", \"Route multi-domain content\"",
+      "model": "sonnet",
+      "color": "red"
+    },
+    {
+      "name": "database-manager-enhanced",
+      "description": "Enhanced database operations with completeness scoring and follow-up tracking. Examples: \"Store partial records with quality metadata\", \"Generate completeness reports\"",
+      "model": "sonnet",
+      "color": "purple"
+    }
+  ],
+  "hooks": {
+    "SessionStart": [
+      "./automation/monitor-hooks/smart-monitor.sh"
+    ],
+    "UserPromptSubmit": [
+      "./automation/monitor-hooks/smart-monitor.sh"
+    ]
+  },
+  "preferences": {
+    "verbosity": "normal",
+    "auto_save": true,
+    "theme": "auto",
+    "confirm_destructive_actions": true
+  },
+  "mcp_servers": {
+    "messaging-bridge": {
+      "command": "python3",
+      "args": ["./mcp-servers/messaging-bridge/server.py"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "database-connector": {
+      "command": "python3",
+      "args": ["./mcp-servers/database-connector/connector.py"],
+      "env": {
+        "PYTHONPATH": "."
+      }
+    },
+    "context-wrapper": {
+      "command": "./mcp-servers/context-wrapper/wrapper.sh",
+      "args": [],
+      "env": {
+        "UPSTASH_REDIS_REST_URL": "${UPSTASH_REDIS_REST_URL}",
+        "UPSTASH_REDIS_REST_TOKEN": "${UPSTASH_REDIS_REST_TOKEN}",
+        "UPSTASH_VECTOR_REST_URL": "${UPSTASH_VECTOR_REST_URL}",
+        "UPSTASH_VECTOR_REST_TOKEN": "${UPSTASH_VECTOR_REST_TOKEN}",
+        "UPSTASH_REDIS_URL": "${UPSTASH_REDIS_URL}",
+        "UPSTASH_REDIS_TOKEN": "${UPSTASH_REDIS_TOKEN}",
+        "UPSTASH_VECTOR_URL": "${UPSTASH_VECTOR_URL}",
+        "UPSTASH_VECTOR_TOKEN": "${UPSTASH_VECTOR_TOKEN}"
+      }
+    }
+  },
+  "workflows": {
+    "data_processing_enhanced": {
+      "description": "Process new data with enhanced quality and follow-up handling",
+      "steps": [
+        {
+          "agent": "message-processor-enhanced",
+          "task": "Extract messages and media with transcription and translation"
+        },
+        {
+          "agent": "data-sorter-enhanced",
+          "task": "Analyze, route, and identify missing data"
+        },
+        {
+          "agent": "database-manager-enhanced",
+          "task": "Store data with completeness metadata"
+        }
+      ]
+    }
+  }
+}

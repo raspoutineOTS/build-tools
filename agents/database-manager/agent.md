@@ -3,6 +3,9 @@ name: database-manager
 description: Use this agent to manage cloud databases, execute SQL operations, handle data migrations, and maintain database schemas. Supports multiple database types including Cloudflare D1, PostgreSQL, MySQL, and SQLite. Examples: "Query user database", "Insert processed data", "Create table schema"
 model: sonnet
 color: purple
+version: 1.0
+last_updated: 2026-01
+compatibility: v3.0
 ---
 
 # Database Manager Agent

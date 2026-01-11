@@ -105,15 +105,19 @@ D1_ANALYTICS_DATABASE_ID=your_analytics_database_id
 D1_MESSAGING_DATABASE_ID=your_messaging_database_id
 
 # Context7/Upstash
-UPSTASH_REDIS_URL=your_upstash_redis_url
-UPSTASH_REDIS_TOKEN=your_upstash_redis_token
-UPSTASH_VECTOR_URL=your_upstash_vector_url
-UPSTASH_VECTOR_TOKEN=your_upstash_vector_token
+UPSTASH_REDIS_REST_URL=your_upstash_redis_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
+UPSTASH_VECTOR_REST_URL=your_upstash_vector_rest_url
+UPSTASH_VECTOR_REST_TOKEN=your_upstash_vector_rest_token
 EOF
 
 # Secure the file
 chmod 600 .env
 ```
+
+Note: The Context7 wrapper accepts the legacy variable names
+`UPSTASH_REDIS_URL`, `UPSTASH_REDIS_TOKEN`, `UPSTASH_VECTOR_URL`, and
+`UPSTASH_VECTOR_TOKEN` as aliases for backward compatibility.
 
 ### 5. Configuration Files
 
@@ -125,6 +129,17 @@ cp configs/mcp-templates/database-connector-config.json ~/.database-connector/co
 # Copy agents to Claude directory
 cp -r agents/* ~/.claude/agents/
 ```
+
+#### Optional: Choose a Claude settings template
+
+Pick one of the provided settings templates and load it into your Claude Code
+configuration workflow:
+
+- Standard agents: `configs/claude-settings/settings-template.json`
+- Enhanced agents (audio + multilingual + follow-ups): `configs/claude-settings/settings-template-enhanced.json`
+- Domain analyzers (Haiku-optimized): `configs/claude-settings/settings-template-domain-analyzers.json`
+
+See `docs/enhanced-agent-system.md` for enhanced agent usage patterns.
 
 ### 6. Claude Code Integration
 
@@ -160,8 +175,14 @@ claude mcp add context-wrapper ./mcp-servers/context-wrapper/wrapper.sh
     "context-wrapper": {
       "command": "./mcp-servers/context-wrapper/wrapper.sh",
       "env": {
+        "UPSTASH_REDIS_REST_URL": "${UPSTASH_REDIS_REST_URL}",
+        "UPSTASH_REDIS_REST_TOKEN": "${UPSTASH_REDIS_REST_TOKEN}",
+        "UPSTASH_VECTOR_REST_URL": "${UPSTASH_VECTOR_REST_URL}",
+        "UPSTASH_VECTOR_REST_TOKEN": "${UPSTASH_VECTOR_REST_TOKEN}",
         "UPSTASH_REDIS_URL": "${UPSTASH_REDIS_URL}",
-        "UPSTASH_REDIS_TOKEN": "${UPSTASH_REDIS_TOKEN}"
+        "UPSTASH_REDIS_TOKEN": "${UPSTASH_REDIS_TOKEN}",
+        "UPSTASH_VECTOR_URL": "${UPSTASH_VECTOR_URL}",
+        "UPSTASH_VECTOR_TOKEN": "${UPSTASH_VECTOR_TOKEN}"
       }
     }
   }

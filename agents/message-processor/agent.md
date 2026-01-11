@@ -3,6 +3,9 @@ name: message-processor
 description: Use this agent to retrieve and process messages from multiple platforms (WhatsApp, Telegram, Discord, etc.), handle audio transcription, and perform conversation analysis. Examples: "Get recent messages from WhatsApp", "Transcribe voice messages", "Search conversation history"
 model: sonnet
 color: blue
+version: 1.0
+last_updated: 2026-01
+compatibility: v3.0
 ---
 
 # Message Processor Agent

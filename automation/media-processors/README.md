@@ -14,6 +14,10 @@ Collection of media processing tools for WhatsApp messages and attachments.
 ```bash
 # Audio Transcription
 export ELEVENLABS_API_KEY="your_elevenlabs_api_key"
+export ELEVENLABS_STT_MODEL_ID="scribe_v1"
+export ELEVENLABS_ENABLE_LOGGING="true"
+export ELEVENLABS_DIARIZE="false"
+export ELEVENLABS_TAG_AUDIO_EVENTS="false"
 export WHATSAPP_STORE_PATH="/path/to/whatsapp/store"
 export TRANSCRIPTIONS_PATH="/path/to/output/transcriptions"
 

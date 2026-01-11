@@ -1,7 +1,7 @@
 # 🏛️ REPOSITORY GOVERNANCE
 
 **Version**: 1.0
-**Last Updated**: January 2025
+**Last Updated**: January 2026
 **Status**: Active
 
 ---
@@ -464,7 +464,7 @@ Use this checklist when moving code from private to public:
 ---
 
 **Version History**:
-- v1.0 (January 2025): Initial governance document
+- v1.0 (January 2026): Initial governance document
 
 **Maintainers**: See `README.md` in build-tools repository
 

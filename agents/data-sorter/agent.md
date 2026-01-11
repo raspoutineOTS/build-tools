@@ -3,6 +3,9 @@ name: data-sorter
 description: Use this agent to analyze, categorize, and intelligently sort data from multiple sources. Performs pattern recognition, priority classification, and content organization. Examples: "Analyze message data for trends", "Categorize documents by type", "Identify high-priority items"
 model: sonnet
 color: yellow
+version: 1.0
+last_updated: 2026-01
+compatibility: v3.0
 ---
 
 # Data Sorter Agent

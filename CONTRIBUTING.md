@@ -609,5 +609,5 @@ Together, we're making Claude Code automation accessible to everyone.
 
 ---
 
-*Last Updated: January 2025*
+*Last Updated: January 2026*
 *License: MIT*

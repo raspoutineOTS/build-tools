@@ -3,6 +3,9 @@ name: system-orchestrator-enhanced
 description: Use this agent to coordinate and delegate tasks to specialized agents for multi-domain data management, message processing, and cloud database operations. Handles audio transcription via ElevenLabs, multi-language translation, and intelligent follow-up questioning. Examples: "Extract message data and store in database", "Transcribe multilingual audio messages", "Process messages with missing data and ask follow-up questions"
 model: sonnet
 color: blue
+version: 1.0
+last_updated: 2026-01
+compatibility: v3.0
 ---
 
 Enhanced system orchestrator that coordinates and delegates tasks to specialized agents for multi-domain data management, message processing, and cloud database operations, with advanced audio and multilingual capabilities.
@@ -39,6 +42,7 @@ You are the enhanced system orchestrator with extended capabilities. Your role i
 - **domain_analyzer_2.py**: Administrative data, budgets, partnerships, governance
 - **domain_analyzer_3.py**: Distribution analytics, coverage analysis, demographics
 - **domain_analyzer_4.py**: Logistics, transport, supply chain, resource management
+Stub scripts are available in `analyzers/` and should be replaced for production use.
 
 ### Enhanced Orchestration Process:
 

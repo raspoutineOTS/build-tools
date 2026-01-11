@@ -58,6 +58,10 @@
       "command": "./mcp-servers/context-wrapper/wrapper.sh",
       "args": [],
       "env": {
+        "UPSTASH_REDIS_REST_URL": "${UPSTASH_REDIS_REST_URL}",
+        "UPSTASH_REDIS_REST_TOKEN": "${UPSTASH_REDIS_REST_TOKEN}",
+        "UPSTASH_VECTOR_REST_URL": "${UPSTASH_VECTOR_REST_URL}",
+        "UPSTASH_VECTOR_REST_TOKEN": "${UPSTASH_VECTOR_REST_TOKEN}",
         "UPSTASH_REDIS_URL": "${UPSTASH_REDIS_URL}",
         "UPSTASH_REDIS_TOKEN": "${UPSTASH_REDIS_TOKEN}",
         "UPSTASH_VECTOR_URL": "${UPSTASH_VECTOR_URL}",

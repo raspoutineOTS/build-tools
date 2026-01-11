@@ -68,16 +68,18 @@ build-tools/
 ├── configs/                      # 🔧 Configuration Templates
 │   ├── claude-settings/          # Claude Code settings
 │   └── mcp-templates/            # MCP server configs
+├── analyzers/                    # 🧪 Domain analyzer stubs (optional)
 └── docs/                         # 📚 Documentation
     ├── setup-guide.md
     ├── architecture.md
     ├── ARCHITECTURE_V3.md           # 🆕 v3.0 Architecture guide
+    ├── skills.md                   # Skills registry and mappings
     └── examples/
 ```
 
 ## 🚀 Architecture v3.0: Python to Claude Agents Migration
 
-**Status**: Production Ready | **Update**: January 2025
+**Status**: Production Ready | **Update**: January 2026
 
 ### Major Architectural Shift
 
@@ -150,6 +152,11 @@ Multiple Domain Databases
 
 **Full Documentation**: See `docs/ARCHITECTURE_V3.md` for complete migration guide, customization instructions, and best practices.
 
+## 🧩 Skills Registry
+
+A lightweight skills registry maps common tasks to agents and workflows.
+See `docs/skills.md` for the skill catalog, inputs/outputs, and workflow mappings.
+
 ## 🤖 Intelligent Agents
 
 ### System Orchestrator
@@ -198,6 +205,18 @@ Multiple Domain Databases
 ```bash
 @database-manager Query healthcare database for recent patient data
 ```
+
+## ✨ Enhanced Agents (Optional)
+
+Enhanced agents add multilingual processing, audio transcription, and automated follow-ups.
+See `docs/enhanced-agent-system.md` for details and usage examples.
+
+## ⚙️ Configuration Templates
+
+Claude Code settings templates:
+- Standard agents: `configs/claude-settings/settings-template.json`
+- Enhanced agents: `configs/claude-settings/settings-template-enhanced.json`
+- Domain analyzers (Haiku-optimized): `configs/claude-settings/settings-template-domain-analyzers.json`
 
 **Supported Databases:**
 - Cloudflare D1, PostgreSQL, MySQL, SQLite
@@ -448,10 +467,16 @@ CLOUDFLARE_API_TOKEN=your_api_token
 CLOUDFLARE_D1_DATABASE_ID=your_database_id
 
 # Context7/Upstash
-UPSTASH_REDIS_URL=your_redis_url
-UPSTASH_REDIS_TOKEN=your_redis_token
-UPSTASH_VECTOR_URL=your_vector_url
-UPSTASH_VECTOR_TOKEN=your_vector_token
+UPSTASH_REDIS_REST_URL=your_redis_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_redis_rest_token
+UPSTASH_VECTOR_REST_URL=your_vector_rest_url
+UPSTASH_VECTOR_REST_TOKEN=your_vector_rest_token
+
+# Legacy aliases (optional)
+# UPSTASH_REDIS_URL=your_redis_rest_url
+# UPSTASH_REDIS_TOKEN=your_redis_rest_token
+# UPSTASH_VECTOR_URL=your_vector_rest_url
+# UPSTASH_VECTOR_TOKEN=your_vector_rest_token
 ```
 
 ### Claude Code Integration

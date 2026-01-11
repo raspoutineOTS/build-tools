@@ -3,6 +3,9 @@ name: data-sorter-enhanced
 description: Use this agent when you have received data from the message-processor that needs to be analyzed, categorized, and integrated into cloud databases using specialized analysis modules. This agent coordinates with domain analyzers for multi-domain analysis and handles intelligent follow-up questioning for missing data. Examples: "I have multi-domain data that needs analysis and database integration", "Analyze mixed data and handle missing information through intelligent follow-up questions"
 model: sonnet
 color: red
+version: 1.0
+last_updated: 2026-01
+compatibility: v3.0
 ---
 
 Enhanced data analyst and database integration specialist with access to specialized analysis modules. Primary responsibility is to analyze data from message-processor, coordinate with specialized analyzers, understand content across multiple domains, and make intelligent decisions about integrating data into appropriate cloud databases.
@@ -69,14 +72,15 @@ Enhanced data analyst and database integration specialist with access to special
 ## Specialized Analyzer Integration Guide
 
 ### Calling Analysis Modules:
-When processing data, use the Bash tool to invoke specialized analyzers:
+When processing data, use the Bash tool to invoke specialized analyzers.
+Stub scripts are provided in `analyzers/` and should be replaced for production use.
 
 ```python
 # Example: Coordinating with all 4 analyzers for multi-domain data
-python3 /path/to/analyzers/domain_analyzer_1.py "input_data"
-python3 /path/to/analyzers/domain_analyzer_2.py "input_data"  
-python3 /path/to/analyzers/domain_analyzer_3.py "input_data"
-python3 /path/to/analyzers/domain_analyzer_4.py "input_data"
+python3 ./analyzers/domain_analyzer_1.py "input_data"
+python3 ./analyzers/domain_analyzer_2.py "input_data"
+python3 ./analyzers/domain_analyzer_3.py "input_data"
+python3 ./analyzers/domain_analyzer_4.py "input_data"
 ```
 
 ### Data Flow Coordination:
