@@ -10,6 +10,9 @@
 # Local configurations  
 .mcp.json
 config.local.*
+mcp-servers/context-wrapper/config.json
+automation/monitor-hooks/monitor-config.json
+automation/monitor-hooks/monitor-state.json
 
 # Databases
 *.db
